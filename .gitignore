@@ -1,0 +1,13 @@
+.DS_Store
+_build
+log
+*.beam
+*.mnesia
+*.txt*
+*.swp*
+*.ets
+erl_crash.dump
+.eunit
+.rebar
+_jorel
+rebar.lock
