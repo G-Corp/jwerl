@@ -11,3 +11,8 @@ erl_crash.dump
 .rebar
 _jorel
 rebar.lock
+deps
+ebin
+.erlang.mk
+*.d
+

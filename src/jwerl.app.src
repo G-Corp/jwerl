@@ -3,6 +3,12 @@
   {description, ""},
   {vsn, "1"},
   {registered, []},
+  {modules, [
+             jwerl,
+             jwerl_es,
+             jwerl_hs,
+             jwerl_rs
+            ]},
   {applications, [
                   kernel,
                   stdlib
