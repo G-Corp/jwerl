@@ -1,4 +1,4 @@
 PROJECT = jwerl
 DEPS = jsx
-dep_jsx = git https://github.com/talentdeficit/jsx master
+dep_jsx = hex 2.6.2
 include erlang.mk
