@@ -16,7 +16,7 @@ defmodule Jwerl.Mixfile do
 
   defp deps do
     [ 
-      {:jsx, ~r/.*/, git: "https://github.com/talentdeficit/jsx", branch: "master"},
+      {:jsx, "~> 2.8.0"},
     ]
   end
 end

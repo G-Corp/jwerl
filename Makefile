@@ -8,6 +8,6 @@ ELIXIR_BINDINGS = jwerl
 dep_mix.mk = git https://github.com/botsunit/mix.mk.git master
 
 DEPS = jsx
-dep_jsx = git https://github.com/talentdeficit/jsx master
+dep_jsx = hex 2.8.0
 
 include erlang.mk
