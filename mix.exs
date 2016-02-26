@@ -16,7 +16,7 @@ defmodule Jwerl.Mixfile do
 
   defp deps do
     [ 
-      {:jsx, "~> 2.8.0"},
+      {:jsx, "~> 2.6.2"},
     ]
   end
 end
