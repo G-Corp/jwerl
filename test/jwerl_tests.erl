@@ -11,7 +11,9 @@ jwerl_test_() ->
     ?_test(t_jwerl_none()),
     ?_test(t_jwerl_sha()),
     ?_test(t_jwerl_rsa()),
-    ?_test(t_jwerl_ecdsa())
+    ?_test(t_jwerl_ecdsa()),
+    ?_test(t_jwerl_no_claims()),
+    ?_test(t_jwerl_claims())
    ]}.
 
 setup() ->
@@ -68,6 +70,40 @@ t_jwerl_ecdsa() ->
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, #{alg => <<"ES512">>, key => ec_private_key()}),
                              #{alg => <<"ES512">>, key => ec_public_key()})).
+
+t_jwerl_no_claims() ->
+  Now = os:system_time(seconds),
+  %% All three claim timestamps are invalid but check_claims => false
+  Data1 = #{key => <<"value">>, exp => Now, nbf => Now + 10, iat => Now + 10},
+  ?assertMatch({ok, Data1}, jwerl:verify(
+                              jwerl:sign(Data1, #{alg => none}),
+                              #{alg => none, check_claims => false})),
+  %% No claims, ignore
+  Data2 = #{key => <<"value">>},
+  ?assertMatch({ok, Data2}, jwerl:verify(
+                              jwerl:sign(Data2, #{alg => none}),
+                              #{alg => none, check_claims => true})).
+
+t_jwerl_claims() ->
+  Now = os:system_time(seconds),
+  %% All ok
+  Data1 = #{key => <<"value">>, exp => Now + 10, nbf => Now, iat => Now},
+  ?assertMatch({ok, Data1}, jwerl:verify(
+                              jwerl:sign(Data1, #{alg => none}),
+                              #{alg => none, check_claims => true})),
+  %% Claim check fail conditions
+  Data2 = #{key => <<"value">>, exp => Now, nbf => Now, iat => Now},
+  ?assertMatch({error, expired}, jwerl:verify(
+                                   jwerl:sign(Data2, #{alg => none}),
+                                   #{alg => none})),
+  Data3 = #{key => <<"value">>, exp => Now + 10, nbf => Now, iat => Now + 10},
+  ?assertMatch({error, future_issued_at}, jwerl:verify(
+                                   jwerl:sign(Data3, #{alg => none}),
+                                   #{alg => none})),
+  Data4 = #{key => <<"value">>, exp => Now + 10, nbf => Now + 10, iat => Now},
+  ?assertMatch({error, not_yet_valid}, jwerl:verify(
+                                   jwerl:sign(Data4, #{alg => none}),
+                                   #{alg => none})).
 
 rsa_private_key() ->
   % openssl genrsa -out private_key.pem 4096
