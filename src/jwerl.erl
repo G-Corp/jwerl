@@ -15,9 +15,47 @@ sign(Data, Options) ->
 verify(Data) ->
   verify(Data, #{}).
 verify(Data, Options) ->
-  decode(Data, 
-         algorithm_to_atom(maps:get(alg, Options, ?DEFAULT_ALG)),
-         maps:get(key, Options, <<>>)).
+  CheckClaims = maps:get(check_claims, Options, true),
+  case decode(Data,
+              algorithm_to_atom(maps:get(alg, Options, ?DEFAULT_ALG)),
+              maps:get(key, Options, <<>>)) of
+    {ok, TokenData} when CheckClaims ->
+      case (catch check_claims(TokenData)) of
+        ok ->
+          {ok, TokenData};
+        Reason ->
+          {error, Reason}
+      end;
+    Result ->
+      Result
+  end.
+
+check_claims(TokenData) ->
+  Now = os:system_time(seconds),
+  check_claim(TokenData, exp, fun(ExpireTime) ->
+                    Now < ExpireTime
+                end, expired),
+  check_claim(TokenData, iat, fun(IssuedAt) ->
+                    IssuedAt =< Now
+                end, future_issued_at),
+  check_claim(TokenData, nbf, fun(NotBefore) ->
+                    NotBefore =< Now
+                end, not_yet_valid),
+  ok.
+
+check_claim(TokenData, Key, F, FailReason) ->
+  case maps:find(Key, TokenData) of
+    error ->
+      %% Ignore if missing. If it has been correctly signed,
+      %% this was intended.
+      true;
+    {ok, Value} ->
+      %% Call back if found for custom checking logic
+      case F(Value) of
+        true -> ok;
+        false -> throw(FailReason)
+      end
+  end.
 
 encode(Data, #{alg := none} = Options, _) ->
   encode_input(Data, Options);
