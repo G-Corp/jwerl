@@ -10,7 +10,6 @@ erl_crash.dump
 .eunit
 .rebar
 _jorel
-rebar.lock
 deps
 ebin
 .erlang.mk
