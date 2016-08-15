@@ -1,3 +1,4 @@
+% @hidden
 -module(jwerl_hs).
 
 -export([sign/3, verify/4]).

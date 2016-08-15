@@ -15,4 +15,4 @@ deps
 ebin
 .erlang.mk
 *.d
-
+test/eunit/

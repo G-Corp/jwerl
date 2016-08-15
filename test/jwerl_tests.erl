@@ -32,7 +32,7 @@ t_jwerl_default() ->
 t_jwerl_none() ->
   Data = #{key => <<"value">>},
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => none}), 
+                             jwerl:sign(Data, #{alg => none}),
                              #{alg => none})).
 
 t_jwerl_sha() ->
@@ -161,19 +161,19 @@ rsa_private_key() ->
 
 rsa_public_key() ->
   % openssl rsa -pubout -in private_key.pem -out public_key.pem
-  <<"-----BEGIN PUBLIC KEY-----\n", 
-    "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0HSV8/KmhlU/Z0QA1BQP\n", 
-    "Hbr19f8aIuE92PLAA8IDv+8yvr7oGFPX7WYW/WlaOguUkFNSleuFz1fphBWdoe+W\n", 
-    "xbm2/kRyahRAggnWq1QWERAJHIMfQ93R4hy0nfN4mepid13ZH6GEEGG7hFLQ2/Cr\n", 
-    "I0GvvfjcJGkP3FfcOzrE85YGMctFQEKnqleTpdk+6FuPiCu1RVKJPhEpJ+E7KOC1\n", 
-    "+yFnZozXyAxjyovxxMKMmQKs8FJ9nzgbmeNjn3wwNzZc1lzf4bSUxrPNolTHPzcL\n", 
-    "XHIgIVGMOuatrqLTxNVauMlvWwp3gzPuMGOS0mgG+vF9n+kPjvwis446rocgnIvv\n", 
-    "qdvRxPwNMN9tMbaNZt5kBF2DEMMF8bHl7vHGhkK12O7+ia8miclWNACrz5bSuX/z\n", 
-    "qhdYC60zkMs54h8TUMX78c7gNTCBcD54BjstCKZg/V9LCNb6VrPJRYkAzAacs4Es\n", 
-    "Jqw5iZ8YpzuYg4z9UxmJx1qusYeXye3iP6ZZZYhaQVftLIM5CdGTF0FSqIxbf8lK\n", 
-    "MJvRxIkwMyhdo5AFl50t3Pj+rSR/fsSrYAc+Zp8ZAeXGRjjdj86J649nSHRJtNpi\n", 
-    "kmrzbn4CRfjRruTJY4QduN5W2gPMHelZB+j7FscI1mylpcS4Ig5/SYutEP6qrwB6\n", 
-    "TYwKDoi8i9jnNBVR11kDfqcCAwEAAQ==\n", 
+  <<"-----BEGIN PUBLIC KEY-----\n",
+    "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0HSV8/KmhlU/Z0QA1BQP\n",
+    "Hbr19f8aIuE92PLAA8IDv+8yvr7oGFPX7WYW/WlaOguUkFNSleuFz1fphBWdoe+W\n",
+    "xbm2/kRyahRAggnWq1QWERAJHIMfQ93R4hy0nfN4mepid13ZH6GEEGG7hFLQ2/Cr\n",
+    "I0GvvfjcJGkP3FfcOzrE85YGMctFQEKnqleTpdk+6FuPiCu1RVKJPhEpJ+E7KOC1\n",
+    "+yFnZozXyAxjyovxxMKMmQKs8FJ9nzgbmeNjn3wwNzZc1lzf4bSUxrPNolTHPzcL\n",
+    "XHIgIVGMOuatrqLTxNVauMlvWwp3gzPuMGOS0mgG+vF9n+kPjvwis446rocgnIvv\n",
+    "qdvRxPwNMN9tMbaNZt5kBF2DEMMF8bHl7vHGhkK12O7+ia8miclWNACrz5bSuX/z\n",
+    "qhdYC60zkMs54h8TUMX78c7gNTCBcD54BjstCKZg/V9LCNb6VrPJRYkAzAacs4Es\n",
+    "Jqw5iZ8YpzuYg4z9UxmJx1qusYeXye3iP6ZZZYhaQVftLIM5CdGTF0FSqIxbf8lK\n",
+    "MJvRxIkwMyhdo5AFl50t3Pj+rSR/fsSrYAc+Zp8ZAeXGRjjdj86J649nSHRJtNpi\n",
+    "kmrzbn4CRfjRruTJY4QduN5W2gPMHelZB+j7FscI1mylpcS4Ig5/SYutEP6qrwB6\n",
+    "TYwKDoi8i9jnNBVR11kDfqcCAwEAAQ==\n",
     "-----END PUBLIC KEY-----">>.
 
 ec_private_key() ->

@@ -1,6 +1,6 @@
 -module(jwerl).
 
--export([sign/1, sign/2, 
+-export([sign/1, sign/2,
          verify/1, verify/2]).
 
 -define(DEFAULT_ALG, <<"HS256">>).
@@ -108,9 +108,9 @@ payload(Data, none, _) ->
 payload(Data, Alg, Key) ->
   [Header, Data1, Signature] = binary:split(Data, <<".">>, [global]),
   {AlgMod, ShaBits} = algorithm_to_infos(Alg),
-  case erlang:apply(AlgMod, verify, [ShaBits, 
-                                     Key, 
-                                     <<Header/binary, ".", Data1/binary>>, 
+  case erlang:apply(AlgMod, verify, [ShaBits,
+                                     Key,
+                                     <<Header/binary, ".", Data1/binary>>,
                                      base64_decode(Signature)]) of
     true ->
       {ok, jsx:decode(base64_decode(Data1), [return_maps, {labels, atom}])};
