@@ -8,6 +8,9 @@ __Version:__ 0.1.0
 
 __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.lejeune@gmail.com)).
 
+[![Hex.pm version](https://img.shields.io/hexpm/v/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
+[![Hex.pm downloads](https://img.shields.io/hexpm/dt/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
+[![License](https://img.shields.io/hexpm/l/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 
 
 ## Licence ##

@@ -3,6 +3,11 @@
 @version 0.1.0
 @title JWErl
 @doc
+
+[![Hex.pm version](https://img.shields.io/hexpm/v/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
+[![Hex.pm downloads](https://img.shields.io/hexpm/dt/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
+[![License](https://img.shields.io/hexpm/l/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
+
 <h2>Licence</h2>
 
 <p>Copyright (c) 2015, 2016, G-Corp<br />
