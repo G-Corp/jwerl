@@ -32,7 +32,7 @@ verify(Data, Options) ->
   end.
 
 payload(Data) ->
-    payload(Data, none, none).
+  payload(Data, none, none).
 
 check_claims(TokenData) ->
   Now = os:system_time(seconds),
@@ -100,7 +100,7 @@ urldecode_digit($-) -> $+;
 urldecode_digit(D)  -> D.
 
 config_headers(Options) ->
-  maps:merge(?DEFAULT_HEADER, #{alg => maps:get(alg, Options, ?DEFAULT_ALG)}).
+  maps:merge(?DEFAULT_HEADER, Options).
 
 decode_header(Data) ->
   [Header|_] = binary:split(Data, <<".">>, [global]),
