@@ -13,7 +13,8 @@ jwerl_test_() ->
     ?_test(t_jwerl_rsa()),
     ?_test(t_jwerl_ecdsa()),
     ?_test(t_jwerl_no_claims()),
-    ?_test(t_jwerl_claims())
+    ?_test(t_jwerl_claims()),
+    ?_test(t_jwerl_payload())
    ]}.
 
 setup() ->
@@ -104,6 +105,10 @@ t_jwerl_claims() ->
   ?assertMatch({error, not_yet_valid}, jwerl:verify(
                                    jwerl:sign(Data4, #{alg => none}),
                                    #{alg => none})).
+
+t_jwerl_payload() ->
+  Data = #{key => <<"value">>},
+  ?assertMatch({ok, Data}, jwerl:payload(jwerl:sign(Data))).
 
 rsa_private_key() ->
   % openssl genrsa -out private_key.pem 4096

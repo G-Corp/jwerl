@@ -1,7 +1,8 @@
 -module(jwerl).
 
 -export([sign/1, sign/2,
-         verify/1, verify/2]).
+         verify/1, verify/2,
+         payload/1]).
 
 -define(DEFAULT_ALG, <<"HS256">>).
 -define(DEFAULT_HEADER, #{typ => <<"JWT">>,
@@ -29,6 +30,9 @@ verify(Data, Options) ->
     Result ->
       Result
   end.
+
+payload(Data) ->
+    payload(Data, none, none).
 
 check_claims(TokenData) ->
   Now = os:system_time(seconds),
