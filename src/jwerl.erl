@@ -2,7 +2,7 @@
 
 -export([sign/1, sign/2,
          verify/1, verify/2,
-         payload/1]).
+         payload/1, header/1]).
 
 -define(DEFAULT_ALG, <<"HS256">>).
 -define(DEFAULT_HEADER, #{typ => <<"JWT">>,
@@ -32,7 +32,11 @@ verify(Data, Options) ->
   end.
 
 payload(Data) ->
-  payload(Data, none, none).
+  {ok, P} = payload(Data, none, none),
+  P.
+
+header(Data) ->
+  decode_header(Data).
 
 check_claims(TokenData) ->
   Now = os:system_time(seconds),

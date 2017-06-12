@@ -14,7 +14,8 @@ jwerl_test_() ->
     ?_test(t_jwerl_ecdsa()),
     ?_test(t_jwerl_no_claims()),
     ?_test(t_jwerl_claims()),
-    ?_test(t_jwerl_payload())
+    ?_test(t_jwerl_payload()),
+    ?_test(t_jwerl_header())
    ]}.
 
 setup() ->
@@ -108,7 +109,12 @@ t_jwerl_claims() ->
 
 t_jwerl_payload() ->
   Data = #{key => <<"value">>},
-  ?assertMatch({ok, Data}, jwerl:payload(jwerl:sign(Data))).
+  ?assertMatch(Data, jwerl:payload(jwerl:sign(Data))).
+
+t_jwerl_header() ->
+  Data = #{key => <<"value">>},
+  DefaultHeader = #{typ => <<"JWT">>, alg => <<"HS256">>},
+  ?assertMatch(DefaultHeader, jwerl:header(jwerl:sign(Data))).
 
 rsa_private_key() ->
   % openssl genrsa -out private_key.pem 4096
