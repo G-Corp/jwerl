@@ -1,7 +1,8 @@
 -module(jwerl).
 
 -export([sign/1, sign/2,
-         verify/1, verify/2]).
+         verify/1, verify/2,
+         payload/1, header/1]).
 
 -define(DEFAULT_ALG, <<"HS256">>).
 -define(DEFAULT_HEADER, #{typ => <<"JWT">>,
@@ -29,6 +30,13 @@ verify(Data, Options) ->
     Result ->
       Result
   end.
+
+payload(Data) ->
+  {ok, P} = payload(Data, none, none),
+  P.
+
+header(Data) ->
+  decode_header(Data).
 
 check_claims(TokenData) ->
   Now = os:system_time(seconds),
@@ -96,7 +104,7 @@ urldecode_digit($-) -> $+;
 urldecode_digit(D)  -> D.
 
 config_headers(Options) ->
-  maps:merge(?DEFAULT_HEADER, #{alg => maps:get(alg, Options, ?DEFAULT_ALG)}).
+  maps:merge(?DEFAULT_HEADER, Options).
 
 decode_header(Data) ->
   [Header|_] = binary:split(Data, <<".">>, [global]),
