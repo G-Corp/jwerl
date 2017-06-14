@@ -4,6 +4,8 @@
          verify/1, verify/2,
          payload/1, header/1]).
 
+-on_load(conveniece_keys/0).
+
 -define(DEFAULT_ALG, <<"HS256">>).
 -define(DEFAULT_HEADER, #{typ => <<"JWT">>,
                           alg => ?DEFAULT_ALG}).
@@ -108,11 +110,11 @@ config_headers(Options) ->
 
 decode_header(Data) ->
   [Header|_] = binary:split(Data, <<".">>, [global]),
-  jsx:decode(base64_decode(Header), [return_maps, {labels, atom}]).
+  jsx:decode(base64_decode(Header), [return_maps, {labels, attempt_atom}]).
 
 payload(Data, none, _) ->
   [_, Data1|_] = binary:split(Data, <<".">>, [global]),
-  {ok, jsx:decode(base64_decode(Data1), [return_maps, {labels, atom}])};
+  {ok, jsx:decode(base64_decode(Data1), [return_maps, {labels, attempt_atom}])};
 payload(Data, Alg, Key) ->
   [Header, Data1, Signature] = binary:split(Data, <<".">>, [global]),
   {AlgMod, ShaBits} = algorithm_to_infos(Alg),
@@ -121,7 +123,7 @@ payload(Data, Alg, Key) ->
                                      <<Header/binary, ".", Data1/binary>>,
                                      base64_decode(Signature)]) of
     true ->
-      {ok, jsx:decode(base64_decode(Data1), [return_maps, {labels, atom}])};
+      {ok, jsx:decode(base64_decode(Data1), [return_maps, {labels, attempt_atom}])};
     _ ->
       {error, invalid_signature}
   end.
@@ -169,3 +171,25 @@ algorithm_to_infos(Algo) ->
     _ ->
       exit(invalid_algorithme)
   end.
+
+conveniece_keys() ->
+    registered_claim_names(),
+    header_parameters(),
+    miscellaneous(),
+    ok.
+
+registered_claim_names() ->
+    iss,
+    sub,
+    aud,
+    exp,
+    nbf,
+    iat,
+    jti.
+
+header_parameters() ->
+    typ,
+    cty.
+
+miscellaneous() ->
+    alg.
