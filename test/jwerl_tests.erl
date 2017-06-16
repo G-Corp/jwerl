@@ -15,7 +15,9 @@ jwerl_test_() ->
     ?_test(t_jwerl_no_claims()),
     ?_test(t_jwerl_claims()),
     ?_test(t_jwerl_payload()),
-    ?_test(t_jwerl_header())
+    ?_test(t_jwerl_header()),
+    ?_test(t_jwerl_registered_claim_name()),
+    ?_test(t_jwerl_not_registered_claim_name())
    ]}.
 
 setup() ->
@@ -115,6 +117,16 @@ t_jwerl_header() ->
   Data = #{key => <<"value">>},
   DefaultHeader = #{typ => <<"JWT">>, alg => <<"HS256">>},
   ?assertMatch(DefaultHeader, jwerl:header(jwerl:sign(Data))).
+
+t_jwerl_registered_claim_name() ->
+    In = #{<<"sub">> => <<"s">>},
+    Out = #{sub => <<"s">>},
+    ?assertMatch({ok, Out}, jwerl:verify(jwerl:sign(In))).
+
+t_jwerl_not_registered_claim_name() ->
+    Data = #{<<"planet">> => <<"zorg">>},
+    ?assertMatch({ok, Data}, jwerl:verify(jwerl:sign(Data))).
+
 
 rsa_private_key() ->
   % openssl genrsa -out private_key.pem 4096
