@@ -1,7 +1,7 @@
 -module(jwerl).
 
--export([sign/1, sign/2,
-         verify/1, verify/2,
+-export([sign/1, sign/2, sign/3,
+         verify/1, verify/2, verify/3,
          payload/1, header/1]).
 
 -on_load(conveniece_keys/0).
@@ -11,17 +11,18 @@
                           alg => ?DEFAULT_ALG}).
 
 sign(Data) ->
-  sign(Data, #{}).
-sign(Data, Options) ->
-  encode(jsx:encode(Data), config_headers(Options), maps:get(key, Options, <<>>)).
+    sign(Data, hs256, <<"">>).
+sign(Data, Alg) ->
+    sign(Data, Alg, <<"">>).
+sign(Data, Alg, KeyOrPem) ->
+    encode(jsx:encode(Data), config_headers(#{alg => algorithm_to_binary(Alg)}), KeyOrPem).
 
 verify(Data) ->
-  verify(Data, #{}).
-verify(Data, Options) ->
-  CheckClaims = maps:get(check_claims, Options, true),
-  case decode(Data,
-              algorithm_to_atom(maps:get(alg, Options, ?DEFAULT_ALG)),
-              maps:get(key, Options, <<>>)) of
+    verify(Data, <<"">>, true).
+verify(Data, KeyOrPem) ->
+    verify(Data, KeyOrPem, true).
+verify(Data, KeyOrPem, CheckClaims) ->
+  case decode(Data, KeyOrPem) of
     {ok, TokenData} when CheckClaims ->
       case (catch check_claims(TokenData)) of
         ok ->
@@ -67,18 +68,19 @@ check_claim(TokenData, Key, F, FailReason) ->
       end
   end.
 
-encode(Data, #{alg := none} = Options, _) ->
+encode(Data, #{alg := <<"none">>} = Options, _) ->
   encode_input(Data, Options);
 encode(Data, Options, Key) ->
   Input = encode_input(Data, Options),
   <<Input/binary, ".", (signature(maps:get(alg, Options), Key, Input))/binary>>.
 
-decode(Data, Alg, Key) ->
+decode(Data, KeyOrPem) ->
   Header = decode_header(Data),
-  case algorithm_to_atom(maps:get(alg, Header)) of
-    Alg -> payload(Data, Alg, Key);
-    Alg1 -> {error, invalid_algorithm, Alg1, Alg}
-  end.
+  payload(Data, algorithm_to_atom(maps:get(alg, Header)), KeyOrPem).
+  %case algorithm_to_atom(maps:get(alg, Header)) of
+  %  Alg -> payload(Data, Alg, Key);
+  %  Alg1 -> {error, invalid_algorithm, Alg1, Alg}
+  %end.
 
 base64_encode(Data) ->
   Data1 = base64_encode_strip(lists:reverse(base64:encode_to_string(Data))),

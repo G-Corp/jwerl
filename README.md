@@ -13,6 +13,44 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 [![Hex.pm downloads](https://img.shields.io/hexpm/dt/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![License](https://img.shields.io/hexpm/l/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 
+## Support
+- HS256, HS384, HS512
+- RS256, RS384, RS512
+- ES256, ES384, ES512
+
+## Usage ##
+
+```erlang
+% signed by default (hs256)
+Jwt = jwerl:sign([{name, <<"bob">>}]).
+jwerl:verify(Jwt).
+
+% signed by specifing method
+Jwt = jwerl:sign([{name, <<"bob">>}], hs512).
+jwerl:verify(Jwt).
+
+% signed with secret key
+Jwt = jwerl:sign([{name, <<"bob">>}], hs256, <<"kkey">>).
+jwerl:verify(Jwt, <<"kkey">>).
+
+% signed by none
+Jwt = jwerl:sign([{name, <<"bob">>}], none).
+jwerl:verify(Jwt).
+
+% signed by RS512
+{ok, PrivtPem} = file:read_file("path/to/rsa_private_key.pem"),
+{ok, PublcPem} = file:read_file("path/to/rsa_public.pem"),
+Jwt = jwerl:sign([{name, <<"bob">>}], rs512, PrivtPem).
+jwerl:verify(Jwt, PublcPem).
+
+% signed by ES256
+{ok, PrivtPem} = file:read_file("path/to/es_private_key.pem"),
+{ok, PublcPem} = file:read_file("path/to/es_public.pem"),
+Jwt = jwerl:sign([{name, <<"bob">>}], es256, PrivtPem).
+jwerl:verify(Jwt, PublcPem).
+```
+
+Of course, you can find more details in `test/jwerl_tests.erl`.
 
 ## Licence ##
 
