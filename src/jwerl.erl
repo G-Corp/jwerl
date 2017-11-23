@@ -141,9 +141,9 @@ signature(Alg, Key, Data) ->
 algorithm_to_atom(<<"HS256">>) -> hs256;
 algorithm_to_atom(<<"RS256">>) -> rs256;
 algorithm_to_atom(<<"ES256">>) -> es256;
-algorithm_to_atom(<<"HS386">>) -> hs386;
-algorithm_to_atom(<<"RS386">>) -> rs386;
-algorithm_to_atom(<<"ES386">>) -> es386;
+algorithm_to_atom(<<"HS384">>) -> hs384;
+algorithm_to_atom(<<"RS384">>) -> rs384;
+algorithm_to_atom(<<"ES384">>) -> es384;
 algorithm_to_atom(<<"HS512">>) -> hs512;
 algorithm_to_atom(<<"RS512">>) -> rs512;
 algorithm_to_atom(<<"ES512">>) -> es512;
@@ -153,9 +153,9 @@ algorithm_to_atom(_) -> none.
 algorithm_to_binary(hs256) -> <<"HS256">>;
 algorithm_to_binary(rs256) -> <<"RS256">>;
 algorithm_to_binary(es256) -> <<"ES256">>;
-algorithm_to_binary(hs386) -> <<"HS386">>;
-algorithm_to_binary(rs386) -> <<"RS386">>;
-algorithm_to_binary(es386) -> <<"ES386">>;
+algorithm_to_binary(hs384) -> <<"HS384">>;
+algorithm_to_binary(rs384) -> <<"RS384">>;
+algorithm_to_binary(es384) -> <<"ES384">>;
 algorithm_to_binary(hs512) -> <<"HS512">>;
 algorithm_to_binary(rs512) -> <<"RS512">>;
 algorithm_to_binary(es512) -> <<"ES512">>;
