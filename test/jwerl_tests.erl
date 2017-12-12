@@ -30,84 +30,83 @@ t_jwerl_default() ->
   Data = #{key => <<"value">>},
   ?assertMatch({ok, Data}, jwerl:verify(jwerl:sign(Data))),
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{key => <<"s3cr3t k3y">>}),
-                             #{key => <<"s3cr3t k3y">>})).
+                             jwerl:sign(Data, hs256, <<"s3cr3t k3y">>),
+                             <<"s3cr3t k3y">>)).
 
 t_jwerl_none() ->
   Data = #{key => <<"value">>},
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => none}),
-                             #{alg => none})).
+                             jwerl:sign(Data, none),
+                             none)).
 
 t_jwerl_sha() ->
   Data = #{key => <<"value">>},
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => <<"HS256">>, key => <<"s3cr3t k3y">>}),
-                             #{alg => <<"HS256">>, key => <<"s3cr3t k3y">>})),
+                             jwerl:sign(Data, hs256, <<"s3cr3t k3y">>),
+                             <<"s3cr3t k3y">>)),
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => <<"HS384">>, key => <<"s3cr3t k3y">>}),
-                             #{alg => <<"HS384">>, key => <<"s3cr3t k3y">>})),
+                             jwerl:sign(Data, hs384, <<"s3cr3t k3y">>),
+                             <<"s3cr3t k3y">>)),
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => <<"HS512">>, key => <<"s3cr3t k3y">>}),
-                             #{alg => <<"HS512">>, key => <<"s3cr3t k3y">>})).
+                             jwerl:sign(Data, hs512, <<"s3cr3t k3y">>),
+                             <<"s3cr3t k3y">>)).
 
 t_jwerl_rsa() ->
   Data = #{key => <<"value">>},
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => <<"RS256">>, key => rsa_private_key()}),
-                             #{alg => <<"RS256">>, key => rsa_public_key()})),
+                             jwerl:sign(Data, rs256, rsa_private_key()),
+                             rsa_public_key())),
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => <<"RS384">>, key => rsa_private_key()}),
-                             #{alg => <<"RS384">>, key => rsa_public_key()})),
+                             jwerl:sign(Data, rs384, rsa_private_key()),
+                             rsa_public_key())),
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => <<"RS512">>, key => rsa_private_key()}),
-                             #{alg => <<"RS512">>, key => rsa_public_key()})).
+                             jwerl:sign(Data, rs512, rsa_private_key()),
+                             rsa_public_key())).
 
 t_jwerl_ecdsa() ->
   Data = #{key => <<"value">>},
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => <<"ES256">>, key => ec_private_key()}),
-                             #{alg => <<"ES256">>, key => ec_public_key()})),
+                             jwerl:sign(Data, es256, ec_private_key()),
+                             ec_public_key())),
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => <<"ES384">>, key => ec_private_key()}),
-                             #{alg => <<"ES384">>, key => ec_public_key()})),
+                             jwerl:sign(Data, es384, ec_private_key()),
+                             ec_public_key())),
   ?assertMatch({ok, Data}, jwerl:verify(
-                             jwerl:sign(Data, #{alg => <<"ES512">>, key => ec_private_key()}),
-                             #{alg => <<"ES512">>, key => ec_public_key()})).
+                             jwerl:sign(Data, es512, ec_private_key()),
+                             ec_public_key())).
 
 t_jwerl_no_claims() ->
   Now = os:system_time(seconds),
   %% All three claim timestamps are invalid but check_claims => false
   Data1 = #{key => <<"value">>, exp => Now, nbf => Now + 10, iat => Now + 10},
   ?assertMatch({ok, Data1}, jwerl:verify(
-                              jwerl:sign(Data1, #{alg => none}),
-                              #{alg => none, check_claims => false})),
+                              jwerl:sign(Data1, none),
+                              <<"">>, false)),
   %% No claims, ignore
   Data2 = #{key => <<"value">>},
   ?assertMatch({ok, Data2}, jwerl:verify(
-                              jwerl:sign(Data2, #{alg => none}),
-                              #{alg => none, check_claims => true})).
+                              jwerl:sign(Data2, none),
+                              <<"">>, true)).
 
 t_jwerl_claims() ->
   Now = os:system_time(seconds),
   %% All ok
   Data1 = #{key => <<"value">>, exp => Now + 10, nbf => Now, iat => Now},
   ?assertMatch({ok, Data1}, jwerl:verify(
-                              jwerl:sign(Data1, #{alg => none}),
-                              #{alg => none, check_claims => true})),
+                              jwerl:sign(Data1, none),
+                              <<"">>, true)),
   %% Claim check fail conditions
   Data2 = #{key => <<"value">>, exp => Now, nbf => Now, iat => Now},
   ?assertMatch({error, expired}, jwerl:verify(
-                                   jwerl:sign(Data2, #{alg => none}),
-                                   #{alg => none})),
+                                   jwerl:sign(Data2, none))),
+
   Data3 = #{key => <<"value">>, exp => Now + 10, nbf => Now, iat => Now + 10},
   ?assertMatch({error, future_issued_at}, jwerl:verify(
-                                   jwerl:sign(Data3, #{alg => none}),
-                                   #{alg => none})),
+                                   jwerl:sign(Data3, none))),
+
   Data4 = #{key => <<"value">>, exp => Now + 10, nbf => Now + 10, iat => Now},
   ?assertMatch({error, not_yet_valid}, jwerl:verify(
-                                   jwerl:sign(Data4, #{alg => none}),
-                                   #{alg => none})).
+                                   jwerl:sign(Data4, none))).
 
 t_jwerl_payload() ->
   Data = #{key => <<"value">>},
