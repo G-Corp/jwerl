@@ -9,7 +9,7 @@
 ## Function Index ##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#header-1">header/1</a></td><td></td></tr><tr><td valign="top"><a href="#payload-1">payload/1</a></td><td></td></tr><tr><td valign="top"><a href="#sign-1">sign/1</a></td><td></td></tr><tr><td valign="top"><a href="#sign-2">sign/2</a></td><td></td></tr><tr><td valign="top"><a href="#verify-1">verify/1</a></td><td></td></tr><tr><td valign="top"><a href="#verify-2">verify/2</a></td><td></td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#header-1">header/1</a></td><td></td></tr><tr><td valign="top"><a href="#payload-1">payload/1</a></td><td></td></tr><tr><td valign="top"><a href="#sign-1">sign/1</a></td><td></td></tr><tr><td valign="top"><a href="#sign-2">sign/2</a></td><td></td></tr><tr><td valign="top"><a href="#sign-3">sign/3</a></td><td></td></tr><tr><td valign="top"><a href="#verify-1">verify/1</a></td><td></td></tr><tr><td valign="top"><a href="#verify-2">verify/2</a></td><td></td></tr><tr><td valign="top"><a href="#verify-3">verify/3</a></td><td></td></tr></table>
 
 
 <a name="functions"></a>
@@ -38,7 +38,13 @@
 
 ### sign/2 ###
 
-`sign(Data, Options) -> any()`
+`sign(Data, Alg) -> any()`
+
+<a name="sign-3"></a>
+
+### sign/3 ###
+
+`sign(Data, Alg, KeyOrPem) -> any()`
 
 <a name="verify-1"></a>
 
@@ -50,5 +56,11 @@
 
 ### verify/2 ###
 
-`verify(Data, Options) -> any()`
+`verify(Data, KeyOrPem) -> any()`
+
+<a name="verify-3"></a>
+
+### verify/3 ###
+
+`verify(Data, KeyOrPem, CheckClaims) -> any()`
 

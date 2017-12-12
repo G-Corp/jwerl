@@ -9,11 +9,17 @@ defmodule Jwerl do
   def unquote(:"sign")(arg1, arg2) do
     :erlang.apply(:"jwerl", :"sign", [arg1, arg2])
   end
+  def unquote(:"sign")(arg1, arg2, arg3) do
+    :erlang.apply(:"jwerl", :"sign", [arg1, arg2, arg3])
+  end
   def unquote(:"verify")(arg1) do
     :erlang.apply(:"jwerl", :"verify", [arg1])
   end
   def unquote(:"verify")(arg1, arg2) do
     :erlang.apply(:"jwerl", :"verify", [arg1, arg2])
+  end
+  def unquote(:"verify")(arg1, arg2, arg3) do
+    :erlang.apply(:"jwerl", :"verify", [arg1, arg2, arg3])
   end
   def unquote(:"payload")(arg1) do
     :erlang.apply(:"jwerl", :"payload", [arg1])
