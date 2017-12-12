@@ -1,10 +1,14 @@
+# File: mix.exs
+# This file was generated from rebar.config
+# Using rebar3_elixir (https://github.com/G-Corp/rebar3_elixir)
+# MODIFY IT AT YOUR OWN RISK AND ONLY IF YOU KNOW WHAT YOU ARE DOING!
 defmodule Jwerl.Mixfile do
   use Mix.Project
 
   def project do
     [
       app: :jwerl,
-      version: "0.1.3",
+      version: "0.2.0",
       elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -22,7 +26,7 @@ defmodule Jwerl.Mixfile do
 
   defp deps do
     [
-      {:jsx, "~> 2.8.2"}
+      {:jsx, "~> 2.9.0"}
     ]
   end
 
@@ -61,9 +65,9 @@ defmodule Jwerl.Mixfile do
 
   defp trim(x) do
     if Version.compare(System.version, "1.5.0") == :lt do
-      String.strip(x)
+      Kernel.apply(String, :strip, [x])
     else
-      String.trim(x)
+      Kernel.apply(String, :trim, [x])
     end
   end
 end
