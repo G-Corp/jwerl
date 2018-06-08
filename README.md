@@ -8,7 +8,7 @@ __Version:__ 1.0.0
 
 __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.lejeune@gmail.com)).
 
-[![Build Status](https://travis-ci.org/emedia-project/jwerl.svg?branch=master)](https://travis-ci.org/emedia-project/jwerl)
+[![Build Status](https://travis-ci.org/G-Corp/jwerl.svg?branch=master)](https://travis-ci.org/G-Corp/jwerl)
 [![Hex.pm version](https://img.shields.io/hexpm/v/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![Hex.pm downloads](https://img.shields.io/hexpm/dt/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![License](https://img.shields.io/hexpm/l/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
@@ -117,5 +117,5 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 
 <table width="100%" border="0" summary="list of modules">
-<tr><td><a href="https://github.com/emedia-project/jwerl/blob/master/doc/jwerl.md" class="module">jwerl</a></td></tr></table>
+<tr><td><a href="https://github.com/G-Corp/jwerl/blob/master/doc/jwerl.md" class="module">jwerl</a></td></tr></table>
 
