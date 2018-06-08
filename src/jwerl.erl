@@ -1,8 +1,8 @@
 -module(jwerl).
 
 -export([sign/1, sign/2, sign/3,
-         verify/1, verify/2, verify/3,
-         payload/1, header/1]).
+         verify/1, verify/2, verify/3, verify/4,
+         header/1]).
 
 -on_load(conveniece_keys/0).
 
@@ -10,63 +10,165 @@
 -define(DEFAULT_HEADER, #{typ => <<"JWT">>,
                           alg => ?DEFAULT_ALG}).
 
+-type algorithm() :: hs256 | hs384 | hs512 |
+                     rs256 | rs384 | rs512 |
+                     es256 | es384 | es512 |
+                     none.
+
+% @equiv sign(Data, hs256, <<"">>)
+-spec sign(Data :: map()) -> binary().
 sign(Data) ->
     sign(Data, hs256, <<"">>).
-sign(Data, Alg) ->
-    sign(Data, Alg, <<"">>).
-sign(Data, Alg, KeyOrPem) ->
-    encode(jsx:encode(Data), config_headers(#{alg => algorithm_to_binary(Alg)}), KeyOrPem).
+% @equiv sign(Data, Algorithm, <<"">>)
+-spec sign(Data :: map(), Algorithm :: algorithm()) -> binary().
+sign(Data, Algorithm) ->
+    sign(Data, Algorithm, <<"">>).
+% @doc
+% Sign <tt>Data</tt> with the given <tt>Algorithm</tt> and <tt>KeyOrPem</tt>.
+%
+% Supported algorithms :
+% <ul>
+% <li>hs256, hs384, hs512</li>
+% <li>rs256, rs384, rs512</li>
+% <li>es256, es384, es512</li>
+% <li>none</li>
+% </ul>
+%
+% This function support ext, nbt, iat, iss, sub, aud and jti.
+%
+% Example:
+%
+% <pre>
+% Token = jwerl:sign(#{key =&gt; &lt;&lt;"Hello World"&gt;&gt;}, hs256, &lt;&lt;"s3cr3t k3y"&gt;&gt;).
+% </pre>
+% @end
+-spec sign(Data :: map() | list(), Algorithm :: algorithm(), KeyOrPem :: binary()) -> binary().
+sign(Data, Algorithm, KeyOrPem) when (is_map(Data) orelse is_list(Data)), is_atom(Algorithm), is_binary(KeyOrPem) ->
+    encode(jsx:encode(Data), config_headers(#{alg => algorithm_to_binary(Algorithm)}), KeyOrPem).
 
+% @equiv verify(Data, <<"">>, hs256, #{})
 verify(Data) ->
-    verify(Data, <<"">>, true).
-verify(Data, KeyOrPem) ->
-    verify(Data, KeyOrPem, true).
-verify(Data, KeyOrPem, CheckClaims) ->
-  case decode(Data, KeyOrPem) of
-    {ok, TokenData} when CheckClaims ->
-      case (catch check_claims(TokenData)) of
+    verify(Data, hs256, <<"">>, #{}).
+% @equiv verify(Data, Algorithm, <<"">>, #{})
+verify(Data, Algorithm) ->
+    verify(Data, Algorithm, <<"">>, #{}).
+% @equiv verify(Data, Algorithm, KeyOrPem, #{})
+verify(Data, Algorithm, KeyOrPem) ->
+  verify(Data, Algorithm, KeyOrPem, #{}).
+% @doc
+% Verify a JWToken according to the given <tt>Algorithm</tt>, <tt>KeyOrPem</tt> and <tt>Claims</tt>.
+% This verifycation can ignore (<tt>CheckClaims =:= false</tt>) claims.
+%
+% This function support ext, nbt, iat, iss, sub, aud and jti.
+%
+% Example :
+%
+% <pre>
+% jwerl:verify(Token, hs256, &lt;&lt;"s3cr3t k3y"&gt;&gt;, #{sub =&gt; &lt;&lt;"hello"&gt;&gt;,
+%                                                            aud =&gt; [&lt;&lt;"world"&gt;&gt;, &lt;&lt;"aliens"&gt;&gt;]}).
+% </pre>
+% @end
+-spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false) ->
+  {ok, map()} | {error, term()}.
+verify(Data, Algorithm, KeyOrPem, Claims) ->
+  case decode(Data, KeyOrPem, Algorithm) of
+    {ok, TokenData} when is_map(Claims) orelse is_list(Claims) ->
+      case check_claims(TokenData, Claims) of
         ok ->
           {ok, TokenData};
-        Reason ->
-          {error, Reason}
+        Error ->
+          Error
       end;
     Result ->
       Result
   end.
 
-payload(Data) ->
-  {ok, P} = payload(Data, none, none),
-  P.
-
+% @doc
+% Return the header for a given <tt>JWToken</tt>.
+%
+% Example:
+%
+% <pre>
+% jwerl:header(Token).
+% </pre>
+% @end
+-spec header(Data :: binary()) -> map().
 header(Data) ->
   decode_header(Data).
 
-check_claims(TokenData) ->
+check_claims(TokenData, Claims) ->
   Now = os:system_time(seconds),
-  check_claim(TokenData, exp, fun(ExpireTime) ->
-                    Now < ExpireTime
-                end, expired),
-  check_claim(TokenData, iat, fun(IssuedAt) ->
-                    IssuedAt =< Now
-                end, future_issued_at),
-  check_claim(TokenData, nbf, fun(NotBefore) ->
-                    NotBefore =< Now
-                end, not_yet_valid),
-  ok.
+  claims_errors(
+    [
+     check_claim(TokenData, exp, false, fun(ExpireTime) ->
+                                            Now < ExpireTime
+                                        end, exp),
+     check_claim(TokenData, iat, false, fun(IssuedAt) ->
+                                            IssuedAt =< Now
+                                        end, iat),
+     check_claim(TokenData, nbf, false, fun(NotBefore) ->
+                                            NotBefore =< Now
+                                        end, nbf)
+     | [
+        check_claim(
+          TokenData,
+          Claim,
+          true,
+          fun(Value) ->
+              claim_match(Expected, Value)
+          end, Claim)
+        || {Claim, Expected} <- get_claims(Claims)
+       ]
+    ], []).
 
-check_claim(TokenData, Key, F, FailReason) ->
-  case maps:find(Key, TokenData) of
-    error ->
+claims_errors([], []) -> ok;
+claims_errors([], List) -> {error, List};
+claims_errors([ok|Rest], Acc) -> claims_errors(Rest, Acc);
+claims_errors([{error, Error}|Rest], Acc) -> claims_errors(Rest, [Error|Acc]).
+
+claim_match(Expected, Value) ->
+  case is_string_or_uri(Value) of
+    true ->
+      case Expected of
+        Value ->
+          true;
+        List when is_list(List) ->
+          lists:member(Value, List);
+        _Other ->
+          false
+      end;
+    false ->
+      false
+  end.
+
+check_claim(TokenData, Key, Required, F, FailReason) ->
+  case get_claim(Key, TokenData) of
+    error when Required =:= false ->
       %% Ignore if missing. If it has been correctly signed,
       %% this was intended.
-      true;
+      ok;
+    error ->
+      {error, FailReason};
     {ok, Value} ->
       %% Call back if found for custom checking logic
       case F(Value) of
         true -> ok;
-        false -> throw(FailReason)
+        false -> {error, FailReason}
       end
   end.
+
+get_claim(Claim, Map) when is_map(Map) ->
+  maps:find(Claim, Map);
+get_claim(Claim, List) when is_list(List) ->
+  case lists:keyfind(Claim, 1, List) of
+    {Claim, Value} -> {ok, Value};
+    false -> error
+  end.
+
+get_claims(Map) when is_map(Map) ->
+  maps:to_list(Map);
+get_claims(List) when is_list(List) ->
+  List.
 
 encode(Data, #{alg := <<"none">>} = Options, _) ->
   encode_input(Data, Options);
@@ -74,13 +176,12 @@ encode(Data, Options, Key) ->
   Input = encode_input(Data, Options),
   <<Input/binary, ".", (signature(maps:get(alg, Options), Key, Input))/binary>>.
 
-decode(Data, KeyOrPem) ->
+decode(Data, KeyOrPem, Algorithm) ->
   Header = decode_header(Data),
-  payload(Data, algorithm_to_atom(maps:get(alg, Header)), KeyOrPem).
-  %case algorithm_to_atom(maps:get(alg, Header)) of
-  %  Alg -> payload(Data, Alg, Key);
-  %  Alg1 -> {error, invalid_algorithm, Alg1, Alg}
-  %end.
+  case algorithm_to_atom(maps:get(alg, Header)) of
+    Algorithm -> payload(Data, Algorithm, KeyOrPem);
+    Algorithm1 -> {error, {invalid_algorithm, Algorithm1, Algorithm}}
+  end.
 
 base64_encode(Data) ->
   Data1 = base64_encode_strip(lists:reverse(base64:encode_to_string(Data))),
@@ -117,9 +218,9 @@ decode_header(Data) ->
 payload(Data, none, _) ->
   [_, Data1|_] = binary:split(Data, <<".">>, [global]),
   {ok, jsx:decode(base64_decode(Data1), [return_maps, {labels, attempt_atom}])};
-payload(Data, Alg, Key) ->
+payload(Data, Algorithm, Key) ->
   [Header, Data1, Signature] = binary:split(Data, <<".">>, [global]),
-  {AlgMod, ShaBits} = algorithm_to_infos(Alg),
+  {AlgMod, ShaBits} = algorithm_to_infos(Algorithm),
   case erlang:apply(AlgMod, verify, [ShaBits,
                                      Key,
                                      <<Header/binary, ".", Data1/binary>>,
@@ -133,8 +234,8 @@ payload(Data, Alg, Key) ->
 encode_input(Data, Options) ->
   <<(base64_encode(jsx:encode(Options)))/binary, ".", (base64_encode(Data))/binary>>.
 
-signature(Alg, Key, Data) ->
-  {AlgMod, ShaBits} = algorithm_to_infos(Alg),
+signature(Algorithm, Key, Data) ->
+  {AlgMod, ShaBits} = algorithm_to_infos(Algorithm),
   Signature = erlang:apply(AlgMod, sign, [ShaBits, Key, Data]),
   base64_encode(Signature).
 
@@ -162,8 +263,8 @@ algorithm_to_binary(es512) -> <<"ES512">>;
 algorithm_to_binary(A) when is_binary(A) -> A;
 algorithm_to_binary(_) -> <<"none">>.
 
-algorithm_to_infos(Algo) ->
-  case algorithm_to_binary(Algo) of
+algorithm_to_infos(Algorithm) ->
+  case algorithm_to_binary(Algorithm) of
     <<"HS", ShaBits/binary>> ->
       {jwerl_hs, binary_to_integer(ShaBits)};
     <<"RS", ShaBits/binary>> ->
@@ -195,3 +296,36 @@ header_parameters() ->
 
 miscellaneous() ->
     alg.
+
+is_string_or_uri(Value) when is_binary(Value) ->
+  size(trim(Value, both)) > 0;
+is_string_or_uri(_Value) ->
+  false.
+
+trim(Binary, left) ->
+  trim_left(Binary);
+trim(Binary, right) ->
+  trim_right(Binary);
+trim(Binary, both) ->
+  trim_left(trim_right(Binary)).
+
+trim_left(<<C, Rest/binary>>) when C =:= $\s orelse
+                                   C =:= $\n orelse
+                                   C =:= $\r orelse
+                                   C =:= $\t ->
+  trim_left(Rest);
+trim_left(Binary) -> Binary.
+
+trim_right(Binary) ->
+  trim_right(Binary, size(Binary)-1).
+
+trim_right(Binary, Size) ->
+  case Binary of
+    <<Rest:Size/binary, C>> when C =:= $\s
+                                 orelse C =:= $\t
+                                 orelse C =:= $\n
+                                 orelse C =:= $\r ->
+      trim_right(Rest, Size - 1);
+    Other ->
+      Other
+  end.

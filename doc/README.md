@@ -2,9 +2,9 @@
 
 # JWErl #
 
-Copyright (c) 2015, 2016, 2017 G-Corp
+Copyright (c) 2015, 2016, 2017, 2018 G-Corp
 
-__Version:__ 0.2.0
+__Version:__ 1.0.0
 
 __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.lejeune@gmail.com)).
 
@@ -12,6 +12,8 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 [![Hex.pm version](https://img.shields.io/hexpm/v/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![Hex.pm downloads](https://img.shields.io/hexpm/dt/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![License](https://img.shields.io/hexpm/l/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
+
+__Warning, versions prior to 1.0.0 are affected by [this vulnerabilitie](https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/). Get up to date!__
 
 
 ## Support ##
@@ -23,6 +25,9 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 
 ## Usage ##
 
+
+### Erlang ###
+
 ```erlang
 
 % signed by default (hs256)
@@ -31,36 +36,69 @@ jwerl:verify(Jwt).
 
 % signed by specifing method
 Jwt = jwerl:sign([{name, <<"bob">>}], hs512).
-jwerl:verify(Jwt).
+jwerl:verify(Jwt, hs512).
 
 % signed with secret key
 Jwt = jwerl:sign([{name, <<"bob">>}], hs256, <<"kkey">>).
-jwerl:verify(Jwt, <<"kkey">>).
+jwerl:verify(Jwt, hs256, <<"kkey">>).
 
 % signed by none
 Jwt = jwerl:sign([{name, <<"bob">>}], none).
-jwerl:verify(Jwt).
+jwerl:verify(Jwt, none).
 
 % signed by RS512
 {ok, PrivtPem} = file:read_file("path/to/rsa_private_key.pem"),
 {ok, PublcPem} = file:read_file("path/to/rsa_public.pem"),
 Jwt = jwerl:sign([{name, <<"bob">>}], rs512, PrivtPem).
-jwerl:verify(Jwt, PublcPem).
+jwerl:verify(Jwt, rs512, PublcPem).
 
 % signed by ES256
 {ok, PrivtPem} = file:read_file("path/to/es_private_key.pem"),
 {ok, PublcPem} = file:read_file("path/to/es_public.pem"),
 Jwt = jwerl:sign([{name, <<"bob">>}], es256, PrivtPem).
-jwerl:verify(Jwt, PublcPem).
+jwerl:verify(Jwt, es256, PublcPem).
 
 ```
 
-Of course, you can find more details in `test/jwerl_tests.erl`.
+
+### Elixir ###
+
+```erlang
+
+% signed by default (hs256)
+jwt = Jwerl.sign([name: "bob"]).
+Jwerl.verify(jwt).
+
+% signed by specifing method
+jwt = Jwerl.sign([name: "bob"], :hs512).
+Jwerl.verify(jwt, :hs512).
+
+% signed with secret key
+jwt = Jwerl.sign([name: "bob"], :hs256, "kkey").
+Jwerl.verify(jwt, :hs256, "kkey").
+
+% signed by none
+jwt = Jwerl.sign([name: "bob"], none).
+Jwerl.verify(jwt, :none).
+
+% signed by RS512
+{ok, private_pem} = File.read("path/to/rsa_private_key.pem"),
+{ok, public_pem} = File.read("path/to/rsa_public.pem"),
+jwt = Jwerl.sign([name: "bob"], :rs512, private_pem).
+Jwerl.verify(jwt, :rs512, public_pem).
+
+% signed by ES256
+{ok, private_pem} = File.read("path/to/es_private_key.pem"),
+{ok, public_pem} = File.read("path/to/es_public.pem"),
+jwt = Jwerl.sign([name: "bob"], :es256, private_pem).
+Jwerl.verify(jwt, :es256, public_pem).
+
+```
 
 
 ## Licence ##
 
-Copyright (c) 2015, 2016, 2017, G-Corp<br />
+Copyright (c) 2015, 2016, 2017, 2018, G-Corp<br />
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

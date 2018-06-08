@@ -14,7 +14,6 @@ jwerl_test_() ->
     ?_test(t_jwerl_ecdsa()),
     ?_test(t_jwerl_no_claims()),
     ?_test(t_jwerl_claims()),
-    ?_test(t_jwerl_payload()),
     ?_test(t_jwerl_header()),
     ?_test(t_jwerl_registered_claim_name()),
     ?_test(t_jwerl_not_registered_claim_name())
@@ -31,7 +30,15 @@ t_jwerl_default() ->
   ?assertMatch({ok, Data}, jwerl:verify(jwerl:sign(Data))),
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, hs256, <<"s3cr3t k3y">>),
-                             <<"s3cr3t k3y">>)).
+                             hs256,
+                             <<"s3cr3t k3y">>)),
+  ?assertMatch({error, {invalid_algorithm, none, hs256}},
+               jwerl:verify(
+                 jwerl:sign(Data, none))),
+  ?assertMatch({error, {invalid_algorithm, none, hs256}},
+               jwerl:verify(
+                 jwerl:sign(Data, none),
+                 hs256)).
 
 t_jwerl_none() ->
   Data = #{key => <<"value">>},
@@ -43,36 +50,45 @@ t_jwerl_sha() ->
   Data = #{key => <<"value">>},
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, hs256, <<"s3cr3t k3y">>),
+                             hs256,
                              <<"s3cr3t k3y">>)),
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, hs384, <<"s3cr3t k3y">>),
+                             hs384,
                              <<"s3cr3t k3y">>)),
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, hs512, <<"s3cr3t k3y">>),
+                             hs512,
                              <<"s3cr3t k3y">>)).
 
 t_jwerl_rsa() ->
   Data = #{key => <<"value">>},
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, rs256, rsa_private_key()),
+                             rs256,
                              rsa_public_key())),
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, rs384, rsa_private_key()),
+                             rs384,
                              rsa_public_key())),
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, rs512, rsa_private_key()),
+                             rs512,
                              rsa_public_key())).
 
 t_jwerl_ecdsa() ->
   Data = #{key => <<"value">>},
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, es256, ec_private_key()),
+                             es256,
                              ec_public_key())),
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, es384, ec_private_key()),
+                             es384,
                              ec_public_key())),
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, es512, ec_private_key()),
+                             es512,
                              ec_public_key())).
 
 t_jwerl_no_claims() ->
@@ -81,12 +97,12 @@ t_jwerl_no_claims() ->
   Data1 = #{key => <<"value">>, exp => Now, nbf => Now + 10, iat => Now + 10},
   ?assertMatch({ok, Data1}, jwerl:verify(
                               jwerl:sign(Data1, none),
-                              <<"">>, false)),
+                              none, <<"">>, false)),
   %% No claims, ignore
   Data2 = #{key => <<"value">>},
   ?assertMatch({ok, Data2}, jwerl:verify(
                               jwerl:sign(Data2, none),
-                              <<"">>, true)).
+                              none, <<"">>, true)).
 
 t_jwerl_claims() ->
   Now = os:system_time(seconds),
@@ -94,23 +110,66 @@ t_jwerl_claims() ->
   Data1 = #{key => <<"value">>, exp => Now + 10, nbf => Now, iat => Now},
   ?assertMatch({ok, Data1}, jwerl:verify(
                               jwerl:sign(Data1, none),
-                              <<"">>, true)),
+                              none, <<"">>, true)),
   %% Claim check fail conditions
   Data2 = #{key => <<"value">>, exp => Now, nbf => Now, iat => Now},
-  ?assertMatch({error, expired}, jwerl:verify(
-                                   jwerl:sign(Data2, none))),
+  ?assertMatch({error, [exp]}, jwerl:verify(
+                                   jwerl:sign(Data2, none),
+                                   none)),
 
   Data3 = #{key => <<"value">>, exp => Now + 10, nbf => Now, iat => Now + 10},
-  ?assertMatch({error, future_issued_at}, jwerl:verify(
-                                   jwerl:sign(Data3, none))),
+  ?assertMatch({error, [iat]}, jwerl:verify(
+                                            jwerl:sign(Data3, none),
+                                            none)),
 
   Data4 = #{key => <<"value">>, exp => Now + 10, nbf => Now + 10, iat => Now},
-  ?assertMatch({error, not_yet_valid}, jwerl:verify(
-                                   jwerl:sign(Data4, none))).
+  ?assertMatch({error, [nbf]}, jwerl:verify(
+                                         jwerl:sign(Data4, none),
+                                         none)),
 
-t_jwerl_payload() ->
-  Data = #{key => <<"value">>},
-  ?assertMatch(Data, jwerl:payload(jwerl:sign(Data))).
+  Data5 = #{key => <<"value">>, sub => <<"hello">>},
+  ?assertMatch({error, [sub]}, jwerl:verify(
+                                 jwerl:sign(Data5, none),
+                                 none, <<"">>,
+                                 #{sub => <<"monde">>})),
+  ?assertMatch({ok, Data5}, jwerl:verify(
+                                 jwerl:sign(Data5, none),
+                                 none, <<"">>,
+                                 #{sub => <<"hello">>})),
+
+  Data6 = #{key => <<"value">>, iss => <<"hello">>},
+  ?assertMatch({error, [iss]}, jwerl:verify(
+                                 jwerl:sign(Data6, none),
+                                 none, <<"">>,
+                                 #{iss => <<"monde">>})),
+  ?assertMatch({ok, Data6}, jwerl:verify(
+                                 jwerl:sign(Data6, none),
+                                 none, <<"">>,
+                                 #{iss => <<"hello">>})),
+
+  Data7 = #{key => <<"value">>, jti => <<"hello">>},
+  ?assertMatch({error, [jti]}, jwerl:verify(
+                                 jwerl:sign(Data7, none),
+                                 none, <<"">>,
+                                 #{jti => <<"monde">>})),
+  ?assertMatch({ok, Data7}, jwerl:verify(
+                                 jwerl:sign(Data7, none),
+                                 none, <<"">>,
+                                 #{jti => <<"hello">>})),
+
+  Data8 = #{key => <<"value">>, aud => <<"hello">>},
+  ?assertMatch({error, [aud]}, jwerl:verify(
+                                 jwerl:sign(Data8, none),
+                                 none, <<"">>,
+                                 #{aud => [<<"monde">>, <<"mundo">>]})),
+  ?assertMatch({ok, Data8}, jwerl:verify(
+                                 jwerl:sign(Data8, none),
+                                 none, <<"">>,
+                                 #{aud => [<<"hello">>, <<"monde">>, <<"mundo">>]})),
+  ?assertMatch({ok, Data8}, jwerl:verify(
+                                 jwerl:sign(Data8, none),
+                                 none, <<"">>,
+                                 #{aud => <<"hello">>})).
 
 t_jwerl_header() ->
   Data = #{key => <<"value">>},
@@ -215,4 +274,3 @@ ec_public_key() ->
     "MEkwEwYHKoZIzj0CAQYIKoZIzj0DAQEDMgAEsm+r7q5vAFuT3kSBS2bFd2hHL5lO\n",
     "+RgzAWQwvrikIQeJlROEzxRG31/YDL8ehzEl\n",
     "-----END PUBLIC KEY-----">>.
-
