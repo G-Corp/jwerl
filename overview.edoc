@@ -8,6 +8,8 @@
 [![Hex.pm version](https://img.shields.io/hexpm/v/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![Hex.pm downloads](https://img.shields.io/hexpm/dt/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![License](https://img.shields.io/hexpm/l/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
+<br/>
+[![JWT](https://jwt.io/img/badge.svg)](https://jwt.io/)
 
 <b>Warning, versions prior to 1.0.0 are affected by <a href="https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/">this vulnerabilitie</a>. Get up to date!</b>
 

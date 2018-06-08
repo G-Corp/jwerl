@@ -12,6 +12,8 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 [![Hex.pm version](https://img.shields.io/hexpm/v/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![Hex.pm downloads](https://img.shields.io/hexpm/dt/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![License](https://img.shields.io/hexpm/l/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
+<br />
+[![JWT](https://jwt.io/img/badge.svg)](https://jwt.io/)
 
 __Warning, versions prior to 1.0.0 are affected by [this vulnerabilitie](https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/). Get up to date!__
 
