@@ -178,7 +178,7 @@ encode(Data, Options, Key) ->
 
 decode(Data, KeyOrPem, Algorithm) ->
   Header = decode_header(Data),
-  case algorithm_to_atom(maps:get(alg, Header)) of
+  case algorithm_to_atom(maps:get(alg, maps:from_list(Header))) of
     Algorithm -> payload(Data, Algorithm, KeyOrPem);
     Algorithm1 -> {error, {invalid_algorithm, Algorithm1, Algorithm}}
   end.
