@@ -1,9 +1,10 @@
 @author Gregoire Lejeune <gregoire.lejeune@gmail.com>
-@copyright 2015, 2016, 2017, 2018 G-Corp
+@copyright 2015, 2016, 2017, 2018, 2019 G-Corp
 @version 1.0.0
 @title JWErl
 @doc
 
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg)](#contributors)
 [![Build Status](https://travis-ci.org/G-Corp/jwerl.svg?branch=master)](https://travis-ci.org/G-Corp/jwerl)
 [![Hex.pm version](https://img.shields.io/hexpm/v/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![Hex.pm downloads](https://img.shields.io/hexpm/dt/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
@@ -59,37 +60,37 @@ jwerl:verify(Jwt, es256, PublcPem).
 
 <pre lang="erlang">
 % signed by default (hs256)
-jwt = Jwerl.sign([name: "bob"]).
-Jwerl.verify(jwt).
+jwt = Jwerl.sign([name: "bob"])
+Jwerl.verify(jwt)
 
 % signed by specifing method
-jwt = Jwerl.sign([name: "bob"], :hs512).
-Jwerl.verify(jwt, :hs512).
+jwt = Jwerl.sign([name: "bob"], :hs512)
+Jwerl.verify(jwt, :hs512)
 
 % signed with secret key
-jwt = Jwerl.sign([name: "bob"], :hs256, "kkey").
-Jwerl.verify(jwt, :hs256, "kkey").
+jwt = Jwerl.sign([name: "bob"], :hs256, "kkey")
+Jwerl.verify(jwt, :hs256, "kkey")
 
 % signed by none
-jwt = Jwerl.sign([name: "bob"], none).
-Jwerl.verify(jwt, :none).
+jwt = Jwerl.sign([name: "bob"], none)
+Jwerl.verify(jwt, :none)
 
 % signed by RS512
-{ok, private_pem} = File.read("path/to/rsa_private_key.pem"),
-{ok, public_pem} = File.read("path/to/rsa_public.pem"),
-jwt = Jwerl.sign([name: "bob"], :rs512, private_pem).
-Jwerl.verify(jwt, :rs512, public_pem).
+{ok, private_pem} = File.read("path/to/rsa_private_key.pem")
+{ok, public_pem} = File.read("path/to/rsa_public.pem")
+jwt = Jwerl.sign([name: "bob"], :rs512, private_pem)
+Jwerl.verify(jwt, :rs512, public_pem)
 
 % signed by ES256
-{ok, private_pem} = File.read("path/to/es_private_key.pem"),
-{ok, public_pem} = File.read("path/to/es_public.pem"),
-jwt = Jwerl.sign([name: "bob"], :es256, private_pem).
-Jwerl.verify(jwt, :es256, public_pem).
+{ok, private_pem} = File.read("path/to/es_private_key.pem")
+{ok, public_pem} = File.read("path/to/es_public.pem")
+jwt = Jwerl.sign([name: "bob"], :es256, private_pem)
+Jwerl.verify(jwt, :es256, public_pem)
 </pre>
 
 <h2>Licence</h2>
 
-<p>Copyright (c) 2015, 2016, 2017, 2018, G-Corp<br />
+<p>Copyright (c) 2015, 2016, 2017, 2018, 2019, G-Corp<br />
 All rights reserved.</p>
 
 <p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</p>
@@ -101,4 +102,5 @@ All rights reserved.</p>
 </ol>
 
 <p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+
 @end

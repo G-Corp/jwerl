@@ -1,0 +1,65 @@
+{
+  "projectName": "jwerl",
+  "projectOwner": "G-Corp",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "badgeTemplate": "[![All Contributors](https://img.shields.io/badge/all_contributors-<%= contributors.length %>-orange.svg)](#contributors)",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "astro",
+      "name": "Astro",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/12923?v=4",
+      "profile": "http://spaceboyz.net/~astro/",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "glejeune",
+      "name": "Gregoire Lejeune",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/15168?v=4",
+      "profile": "http://lejeun.es",
+      "contributions": [
+        "code",
+        "design",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "michalwski",
+      "name": "Michał Piotrowski",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/705828?v=4",
+      "profile": "https://github.com/michalwski",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "HJianBo",
+      "name": "JianBo He",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/13825269?v=4",
+      "profile": "https://hjianbo.me",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "m13m",
+      "name": "Mohammad Maqbool Alam",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/7526000?v=4",
+      "profile": "https://maqbool.net",
+      "contributions": [
+        "doc"
+      ]
+    }
+  ]
+}
