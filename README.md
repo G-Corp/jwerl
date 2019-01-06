@@ -65,35 +65,35 @@ jwerl:verify(Jwt, es256, PublcPem).
 
 ### Elixir ###
 
-```erlang
+```elixir
 
-% signed by default (hs256)
-jwt = Jwerl.sign([name: "bob"]).
-Jwerl.verify(jwt).
+# signed by default (hs256)
+jwt = Jwerl.sign([name: "bob"])
+Jwerl.verify(jwt)
 
-% signed by specifing method
-jwt = Jwerl.sign([name: "bob"], :hs512).
-Jwerl.verify(jwt, :hs512).
+# signed by specifing method
+jwt = Jwerl.sign([name: "bob"], :hs512)
+Jwerl.verify(jwt, :hs512)
 
-% signed with secret key
-jwt = Jwerl.sign([name: "bob"], :hs256, "kkey").
-Jwerl.verify(jwt, :hs256, "kkey").
+# signed with secret key
+jwt = Jwerl.sign([name: "bob"], :hs256, "kkey")
+Jwerl.verify(jwt, :hs256, "kkey")
 
-% signed by none
-jwt = Jwerl.sign([name: "bob"], none).
-Jwerl.verify(jwt, :none).
+# signed by none
+jwt = Jwerl.sign([name: "bob"], none)
+Jwerl.verify(jwt, :none)
 
-% signed by RS512
-{ok, private_pem} = File.read("path/to/rsa_private_key.pem"),
-{ok, public_pem} = File.read("path/to/rsa_public.pem"),
+# signed by RS512
+{ok, private_pem} = File.read("path/to/rsa_private_key.pem")
+{ok, public_pem} = File.read("path/to/rsa_public.pem")
 jwt = Jwerl.sign([name: "bob"], :rs512, private_pem).
-Jwerl.verify(jwt, :rs512, public_pem).
+Jwerl.verify(jwt, :rs512, public_pem)
 
-% signed by ES256
-{ok, private_pem} = File.read("path/to/es_private_key.pem"),
-{ok, public_pem} = File.read("path/to/es_public.pem"),
-jwt = Jwerl.sign([name: "bob"], :es256, private_pem).
-Jwerl.verify(jwt, :es256, public_pem).
+# signed by ES256
+{ok, private_pem} = File.read("path/to/es_private_key.pem")
+{ok, public_pem} = File.read("path/to/es_public.pem")
+jwt = Jwerl.sign([name: "bob"], :es256, private_pem)
+Jwerl.verify(jwt, :es256, public_pem)
 
 ```
 
