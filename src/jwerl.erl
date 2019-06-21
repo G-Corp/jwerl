@@ -1,7 +1,7 @@
 -module(jwerl).
 
 -export([sign/1, sign/2, sign/3,
-         verify/1, verify/2, verify/3, verify/4,
+         verify/1, verify/2, verify/3, verify/4, verify/5,
          header/1]).
 
 -on_load(conveniece_keys/0).
@@ -46,15 +46,18 @@ sign(Data, Algorithm) ->
 sign(Data, Algorithm, KeyOrPem) when (is_map(Data) orelse is_list(Data)), is_atom(Algorithm), is_binary(KeyOrPem) ->
     encode(jsx:encode(Data), config_headers(#{alg => algorithm_to_binary(Algorithm)}), KeyOrPem).
 
-% @equiv verify(Data, <<"">>, hs256, #{})
+% @equiv verify(Data, <<"">>, hs256, #{}, #{})
 verify(Data) ->
-    verify(Data, hs256, <<"">>, #{}).
-% @equiv verify(Data, Algorithm, <<"">>, #{})
+    verify(Data, hs256, <<"">>, #{}, #{}).
+% @equiv verify(Data, Algorithm, <<"">>, #{}, #{})
 verify(Data, Algorithm) ->
-    verify(Data, Algorithm, <<"">>, #{}).
-% @equiv verify(Data, Algorithm, KeyOrPem, #{})
+    verify(Data, Algorithm, <<"">>, #{}, #{}).
+% @equiv verify(Data, Algorithm, KeyOrPem, #{}, #{})
 verify(Data, Algorithm, KeyOrPem) ->
-  verify(Data, Algorithm, KeyOrPem, #{}).
+  verify(Data, Algorithm, KeyOrPem, #{}, #{}).
+% @equiv verify(Data, Algorithm, KeyOrPem, #{}, #{})
+verify(Data, Algorithm, KeyOrPem, Claims) ->
+  verify(Data, Algorithm, KeyOrPem, Claims, #{}).
 % @doc
 % Verify a JWToken according to the given <tt>Algorithm</tt>, <tt>KeyOrPem</tt> and <tt>Claims</tt>.
 % This verifycation can ignore (<tt>CheckClaims =:= false</tt>) claims.
@@ -68,12 +71,12 @@ verify(Data, Algorithm, KeyOrPem) ->
 %                                                            aud =&gt; [&lt;&lt;"world"&gt;&gt;, &lt;&lt;"aliens"&gt;&gt;]}).
 % </pre>
 % @end
--spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false) ->
+-spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false, Opts :: map()) ->
   {ok, map()} | {error, term()}.
-verify(Data, Algorithm, KeyOrPem, Claims) ->
+verify(Data, Algorithm, KeyOrPem, Claims, Opts) ->
   case decode(Data, KeyOrPem, Algorithm) of
     {ok, TokenData} when is_map(Claims) orelse is_list(Claims) ->
-      case check_claims(TokenData, Claims) of
+      case check_claims(TokenData, Claims, Opts) of
         ok ->
           {ok, TokenData};
         Error ->
@@ -96,7 +99,7 @@ verify(Data, Algorithm, KeyOrPem, Claims) ->
 header(Data) ->
   decode_header(Data).
 
-check_claims(TokenData, Claims) ->
+check_claims(TokenData, Claims, Opts) ->
   Now = os:system_time(seconds),
   claims_errors(
     [
@@ -104,7 +107,8 @@ check_claims(TokenData, Claims) ->
                                             Now < ExpireTime
                                         end, exp),
      check_claim(TokenData, iat, false, fun(IssuedAt) ->
-                                            IssuedAt =< Now
+                                            IatLeeway = maps:get(iat_leeway, Opts, 0),
+                                            IssuedAt - IatLeeway =< Now
                                         end, iat),
      check_claim(TokenData, nbf, false, fun(NotBefore) ->
                                             NotBefore =< Now
