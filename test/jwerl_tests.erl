@@ -16,7 +16,8 @@ jwerl_test_() ->
     ?_test(t_jwerl_claims()),
     ?_test(t_jwerl_header()),
     ?_test(t_jwerl_registered_claim_name()),
-    ?_test(t_jwerl_not_registered_claim_name())
+    ?_test(t_jwerl_not_registered_claim_name()),
+    ?_test(t_jwerl_leeway())
    ]}.
 
 setup() ->
@@ -24,6 +25,22 @@ setup() ->
 
 teardown(_) ->
   ok.
+
+t_jwerl_leeway() ->
+    Now = os:system_time(seconds),
+    IssuedAtWithClockSkew1 = Now + 500,
+    Data1 = #{key => <<"value">>, exp => Now + 1000, nbf => Now, iat => IssuedAtWithClockSkew1},
+    ?assertMatch({error, [iat]}, jwerl:verify(
+                                jwerl:sign(Data1, none),
+                                none,
+                                <<"">>,
+                                #{},
+                                #{iat_leeway => 250})),
+    IssuedAtWithClockSkew2 = Now + 50,
+    Data2 = #{key => <<"value">>, exp => Now + 1000, nbf => Now, iat => IssuedAtWithClockSkew2},
+    ?assertMatch({ok, Data2}, jwerl:verify(
+                                jwerl:sign(Data2, none),
+                                none, <<"">>, #{}, #{iat_leeway => 250})).
 
 t_jwerl_default() ->
   Data = #{key => <<"value">>},
