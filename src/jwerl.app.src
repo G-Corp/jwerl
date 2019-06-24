@@ -8,7 +8,7 @@
 
   , {maintainers, ["Gregoire Lejeune"]}
   , {licenses, ["BSD-3"]}
-  , {links, [{"Github", "https://github.com/G-Corp/jwerl"}]}
+  , {links, [{"Git", "https://gitlab.com/glejeune/jwerl"}]}
   , {files, ["src/*"
              , "lib/*"
              , "Makefile"
