@@ -104,7 +104,8 @@ check_claims(TokenData, Claims, Opts) ->
   claims_errors(
     [
      check_claim(TokenData, exp, false, fun(ExpireTime) ->
-                                            Now < ExpireTime
+                                            ExpLeeway = maps:get(exp_leeway, Opts, 0),
+                                            Now < ExpireTime + ExpLeeway
                                         end, exp),
      check_claim(TokenData, iat, false, fun(IssuedAt) ->
                                             IatLeeway = maps:get(iat_leeway, Opts, 0),

@@ -40,7 +40,15 @@ t_jwerl_leeway() ->
     Data2 = #{key => <<"value">>, exp => Now + 1000, nbf => Now, iat => IssuedAtWithClockSkew2},
     ?assertMatch({ok, Data2}, jwerl:verify(
                                 jwerl:sign(Data2, none),
-                                none, <<"">>, #{}, #{iat_leeway => 250})).
+                                none, <<"">>, #{}, #{iat_leeway => 250})),
+    Data3 = #{key => <<"value">>, exp => Now - 500, nbf => Now, iat => Now },
+    ?assertMatch({error, [exp]}, jwerl:verify(
+                                jwerl:sign(Data3, none),
+                                none, <<"">>, #{}, #{exp_leeway => 250})),
+    Data4 = #{key => <<"value">>, exp => Now - 200, nbf => Now, iat => Now },
+    ?assertMatch({ok, Data4}, jwerl:verify(
+                                jwerl:sign(Data4, none),
+                                none, <<"">>, #{}, #{exp_leeway => 250})).
 
 t_jwerl_default() ->
   Data = #{key => <<"value">>},
