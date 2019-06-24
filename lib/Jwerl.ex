@@ -24,6 +24,9 @@ defmodule Jwerl do
   def unquote(:"verify")(arg1, arg2, arg3, arg4) do
     :erlang.apply(:"jwerl", :"verify", [arg1, arg2, arg3, arg4])
   end
+  def unquote(:"verify")(arg1, arg2, arg3, arg4, arg5) do
+    :erlang.apply(:"jwerl", :"verify", [arg1, arg2, arg3, arg4, arg5])
+  end
   def unquote(:"header")(arg1) do
     :erlang.apply(:"jwerl", :"header", [arg1])
   end
