@@ -60,6 +60,17 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "ricardoccpaiva",
+      "name": "Ricardo Paiva",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/2286067?v=4",
+      "profile": "https://github.com/ricardoccpaiva",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
-  ]
+  ],
+  "commitConvention": "none"
 }
