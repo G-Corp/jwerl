@@ -1,14 +1,16 @@
 {application, jwerl, [
   {description, "JWT Library for Erlang and Elixir"}
-  , {vsn, "1.0.0"}
+  , {vsn, "1.1.0"}
   , {registered, []}
   , {modules, []}
   , {applications, [kernel, stdlib, jsx]}
   , {env, []}
 
-  , {maintainers, ["Gregoire Lejeune"]}
   , {licenses, ["BSD-3"]}
-  , {links, [{"Git", "https://gitlab.com/glejeune/jwerl"}]}
+  , {links, [
+             {"Gitlab", "https://gitlab.com/glejeune/jwerl"}
+             , {"Github (mirror)", "https://github.com/G-Corp/jwerl"}
+            ]}
   , {files, ["src/*"
              , "lib/*"
              , "Makefile"
