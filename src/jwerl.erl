@@ -51,18 +51,18 @@ sign(Data, Algorithm, KeyOrPem) ->
 sign(Data, Algorithm, KeyOrPem, Opts) when (is_map(Data) orelse is_list(Data)), is_atom(Algorithm), is_binary(KeyOrPem), is_list(Opts) ->
     encode(jsx:encode(Data), config_headers(#{alg => algorithm_to_binary(Algorithm)}), KeyOrPem, Opts).
 
-% @equiv verify(Data, <<"">>, hs256, #{})
+% @equiv verify(Data, <<"">>, hs256, #{}, #{})
 verify(Data) ->
-    verify(Data, hs256, <<"">>, #{}).
-% @equiv verify(Data, Algorithm, <<"">>, #{})
+    verify(Data, hs256, <<"">>, #{}, #{}).
+% @equiv verify(Data, Algorithm, <<"">>, #{}, #{})
 verify(Data, Algorithm) ->
-    verify(Data, Algorithm, <<"">>, #{}).
-% @equiv verify(Data, Algorithm, KeyOrPem, #{})
+    verify(Data, Algorithm, <<"">>, #{}, #{}).
+% @equiv verify(Data, Algorithm, KeyOrPem, #{}, #{})
 verify(Data, Algorithm, KeyOrPem) ->
-  verify(Data, Algorithm, KeyOrPem, #{}).
-% @equiv verify(Data, Algorithm, KeyOrPem, Claims, [])
+  verify(Data, Algorithm, KeyOrPem, #{}, #{}).
+% @equiv verify(Data, Algorithm, KeyOrPem, #{}, #{})
 verify(Data, Algorithm, KeyOrPem, Claims) ->
-    verify(Data, Algorithm, KeyOrPem, Claims, []).
+  verify(Data, Algorithm, KeyOrPem, Claims, #{}).
 
 % @doc
 % Verify a JWToken according to the given <tt>Algorithm</tt>, <tt>KeyOrPem</tt> and <tt>Claims</tt>.
@@ -77,12 +77,12 @@ verify(Data, Algorithm, KeyOrPem, Claims) ->
 %                                                            aud =&gt; [&lt;&lt;"world"&gt;&gt;, &lt;&lt;"aliens"&gt;&gt;]}).
 % </pre>
 % @end
--spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false, Opts :: list()) ->
+-spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false, Opts :: map()) ->
   {ok, map()} | {error, term()}.
 verify(Data, Algorithm, KeyOrPem, Claims, Opts) ->
   case decode(Data, KeyOrPem, Algorithm, Opts) of
     {ok, TokenData} when is_map(Claims) orelse is_list(Claims) ->
-      case check_claims(TokenData, Claims) of
+      case check_claims(TokenData, Claims, Opts) of
         ok ->
           {ok, TokenData};
         Error ->
@@ -105,15 +105,17 @@ verify(Data, Algorithm, KeyOrPem, Claims, Opts) ->
 header(Data) ->
   decode_header(Data).
 
-check_claims(TokenData, Claims) ->
+check_claims(TokenData, Claims, Opts) ->
   Now = os:system_time(seconds),
   claims_errors(
     [
      check_claim(TokenData, exp, false, fun(ExpireTime) ->
-                                            Now < ExpireTime
+                                            ExpLeeway = maps:get(exp_leeway, Opts, 0),
+                                            Now < ExpireTime + ExpLeeway
                                         end, exp),
      check_claim(TokenData, iat, false, fun(IssuedAt) ->
-                                            IssuedAt =< Now
+                                            IatLeeway = maps:get(iat_leeway, Opts, 0),
+                                            IssuedAt - IatLeeway =< Now
                                         end, iat),
      check_claim(TokenData, nbf, false, fun(NotBefore) ->
                                             NotBefore =< Now
@@ -231,7 +233,7 @@ payload(Data, Algorithm, Key, Opts) ->
   [Header, Data1, Signature0] = binary:split(Data, <<".">>, [global]),
   {AlgMod, ShaBits} = algorithm_to_infos(Algorithm),
 
-  Signature = case proplists:get_bool(raw, Opts) of
+  Signature = case maps:get(raw, Opts, false) of
                   true -> raw_to_der(base64_decode(Signature0));
                   _ -> base64_decode(Signature0)
               end,
@@ -251,7 +253,7 @@ encode_input(Data, Options) ->
 signature(Algorithm, Key, Data, Opts) ->
   {AlgMod, ShaBits} = algorithm_to_infos(Algorithm),
   Signature0 = erlang:apply(AlgMod, sign, [ShaBits, Key, Data]),
-  Signature = case proplists:get_bool(raw, Opts) of
+  Signature = case maps:get(raw, Opts, false) of
                   true ->
                       der_to_raw(Signature0);
                   _ ->
