@@ -89,7 +89,12 @@ t_jwerl_ecdsa() ->
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, es512, ec_private_key()),
                              es512,
-                             ec_public_key())).
+                             ec_public_key())),
+
+  ?assertMatch({ok, Data}, jwerl:verify(
+                             jwerl:sign(Data, es512, ec_private_key(), [raw]),
+                             es512,
+                             ec_public_key(), [], [raw])).
 
 t_jwerl_no_claims() ->
   Now = os:system_time(seconds),
@@ -184,6 +189,12 @@ t_jwerl_registered_claim_name() ->
 t_jwerl_not_registered_claim_name() ->
     Data = #{<<"planet">> => <<"zorg">>},
     ?assertMatch({ok, Data}, jwerl:verify(jwerl:sign(Data))).
+
+t_jwer_raw_signature() ->
+    In = #{<<"sub">> => <<"s">>},
+    Out = #{sub => <<"s">>},
+
+    ?assertMatch({ok, Out}, jwerl:verify(jwerl:sign(In))).
 
 
 rsa_private_key() ->

@@ -58,6 +58,11 @@ jwerl:verify(Jwt, rs512, PublcPem).
 Jwt = jwerl:sign([{name, <<"bob">>}], es256, PrivtPem).
 jwerl:verify(Jwt, es256, PublcPem).
 
+% Compatibility
+%   - sign/verify the signature with raw format instead of DER
+%   - it is necessary to compatible with nodejs or other platforms
+Jwt = jwerl:sign([{name, <<"bob">>}], es256, PrivtPem, [raw]).
+jwerl:verify(Jwt, es256, PublcPem, Claims, [raw]).
 ```
 
 
@@ -94,7 +99,6 @@ jwt = Jwerl.sign([name: "bob"], :es256, private_pem).
 Jwerl.verify(jwt, :es256, public_pem).
 
 ```
-
 
 ## Licence ##
 

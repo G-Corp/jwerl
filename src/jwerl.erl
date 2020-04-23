@@ -1,7 +1,7 @@
 -module(jwerl).
 
--export([sign/1, sign/2, sign/3,
-         verify/1, verify/2, verify/3, verify/4,
+-export([sign/1, sign/2, sign/3, sign/4,
+         verify/1, verify/2, verify/3, verify/4, verify/5,
          header/1]).
 
 -on_load(conveniece_keys/0).
@@ -23,6 +23,11 @@ sign(Data) ->
 -spec sign(Data :: map(), Algorithm :: algorithm()) -> binary().
 sign(Data, Algorithm) ->
     sign(Data, Algorithm, <<"">>).
+
+-spec sign(Data :: map(), Algorithm :: algorithm(), KeyOrPem :: binary()) -> binary().
+sign(Data, Algorithm, KeyOrPem) ->
+    sign(Data, Algorithm, KeyOrPem, []).
+
 % @doc
 % Sign <tt>Data</tt> with the given <tt>Algorithm</tt> and <tt>KeyOrPem</tt>.
 %
@@ -42,9 +47,9 @@ sign(Data, Algorithm) ->
 % Token = jwerl:sign(#{key =&gt; &lt;&lt;"Hello World"&gt;&gt;}, hs256, &lt;&lt;"s3cr3t k3y"&gt;&gt;).
 % </pre>
 % @end
--spec sign(Data :: map() | list(), Algorithm :: algorithm(), KeyOrPem :: binary()) -> binary().
-sign(Data, Algorithm, KeyOrPem) when (is_map(Data) orelse is_list(Data)), is_atom(Algorithm), is_binary(KeyOrPem) ->
-    encode(jsx:encode(Data), config_headers(#{alg => algorithm_to_binary(Algorithm)}), KeyOrPem).
+-spec sign(Data :: map() | list(), Algorithm :: algorithm(), KeyOrPem :: binary(), Opts :: list()) -> binary().
+sign(Data, Algorithm, KeyOrPem, Opts) when (is_map(Data) orelse is_list(Data)), is_atom(Algorithm), is_binary(KeyOrPem), is_list(Opts) ->
+    encode(jsx:encode(Data), config_headers(#{alg => algorithm_to_binary(Algorithm)}), KeyOrPem, Opts).
 
 % @equiv verify(Data, <<"">>, hs256, #{})
 verify(Data) ->
@@ -55,6 +60,10 @@ verify(Data, Algorithm) ->
 % @equiv verify(Data, Algorithm, KeyOrPem, #{})
 verify(Data, Algorithm, KeyOrPem) ->
   verify(Data, Algorithm, KeyOrPem, #{}).
+% @equiv verify(Data, Algorithm, KeyOrPem, Claims, [])
+verify(Data, Algorithm, KeyOrPem, Claims) ->
+    verify(Data, Algorithm, KeyOrPem, Claims, []).
+
 % @doc
 % Verify a JWToken according to the given <tt>Algorithm</tt>, <tt>KeyOrPem</tt> and <tt>Claims</tt>.
 % This verifycation can ignore (<tt>CheckClaims =:= false</tt>) claims.
@@ -68,10 +77,10 @@ verify(Data, Algorithm, KeyOrPem) ->
 %                                                            aud =&gt; [&lt;&lt;"world"&gt;&gt;, &lt;&lt;"aliens"&gt;&gt;]}).
 % </pre>
 % @end
--spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false) ->
+-spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false, Opts :: list()) ->
   {ok, map()} | {error, term()}.
-verify(Data, Algorithm, KeyOrPem, Claims) ->
-  case decode(Data, KeyOrPem, Algorithm) of
+verify(Data, Algorithm, KeyOrPem, Claims, Opts) ->
+  case decode(Data, KeyOrPem, Algorithm, Opts) of
     {ok, TokenData} when is_map(Claims) orelse is_list(Claims) ->
       case check_claims(TokenData, Claims) of
         ok ->
@@ -170,16 +179,16 @@ get_claims(Map) when is_map(Map) ->
 get_claims(List) when is_list(List) ->
   List.
 
-encode(Data, #{alg := <<"none">>} = Options, _) ->
-  encode_input(Data, Options);
-encode(Data, Options, Key) ->
-  Input = encode_input(Data, Options),
-  <<Input/binary, ".", (signature(maps:get(alg, Options), Key, Input))/binary>>.
+encode(Data, #{alg := <<"none">>} = Header, _, _) ->
+  encode_input(Data, Header);
+encode(Data, Header, Key, Opts) ->
+  Input = encode_input(Data, Header),
+  <<Input/binary, ".", (signature(maps:get(alg, Header), Key, Input, Opts))/binary>>.
 
-decode(Data, KeyOrPem, Algorithm) ->
+decode(Data, KeyOrPem, Algorithm, Opts) ->
   Header = decode_header(Data),
   case algorithm_to_atom(maps:get(alg, Header)) of
-    Algorithm -> payload(Data, Algorithm, KeyOrPem);
+    Algorithm -> payload(Data, Algorithm, KeyOrPem, Opts);
     Algorithm1 -> {error, {invalid_algorithm, Algorithm1, Algorithm}}
   end.
 
@@ -215,16 +224,21 @@ decode_header(Data) ->
   [Header|_] = binary:split(Data, <<".">>, [global]),
   jsx:decode(base64_decode(Header), [return_maps, {labels, attempt_atom}]).
 
-payload(Data, none, _) ->
+payload(Data, none, _, _) ->
   [_, Data1|_] = binary:split(Data, <<".">>, [global]),
   {ok, jsx:decode(base64_decode(Data1), [return_maps, {labels, attempt_atom}])};
-payload(Data, Algorithm, Key) ->
-  [Header, Data1, Signature] = binary:split(Data, <<".">>, [global]),
+payload(Data, Algorithm, Key, Opts) ->
+  [Header, Data1, Signature0] = binary:split(Data, <<".">>, [global]),
   {AlgMod, ShaBits} = algorithm_to_infos(Algorithm),
+
+  Signature = case proplists:get_bool(raw, Opts) of
+                  true -> raw_to_der(base64_decode(Signature0));
+                  _ -> base64_decode(Signature0)
+              end,
   case erlang:apply(AlgMod, verify, [ShaBits,
                                      Key,
                                      <<Header/binary, ".", Data1/binary>>,
-                                     base64_decode(Signature)]) of
+                                     Signature]) of
     true ->
       {ok, jsx:decode(base64_decode(Data1), [return_maps, {labels, attempt_atom}])};
     _ ->
@@ -234,10 +248,38 @@ payload(Data, Algorithm, Key) ->
 encode_input(Data, Options) ->
   <<(base64_encode(jsx:encode(Options)))/binary, ".", (base64_encode(Data))/binary>>.
 
-signature(Algorithm, Key, Data) ->
+signature(Algorithm, Key, Data, Opts) ->
   {AlgMod, ShaBits} = algorithm_to_infos(Algorithm),
-  Signature = erlang:apply(AlgMod, sign, [ShaBits, Key, Data]),
+  Signature0 = erlang:apply(AlgMod, sign, [ShaBits, Key, Data]),
+  Signature = case proplists:get_bool(raw, Opts) of
+                  true ->
+                      der_to_raw(Signature0);
+                  _ ->
+                      Signature0
+              end,
   base64_encode(Signature).
+
+der_to_raw(<<48,_,_, L1, R:L1/binary, _, L2, S:L2/binary>>) ->
+    <<(trim_zero_padding(R))/binary, (trim_zero_padding(S))/binary>>.
+
+raw_to_der(Bin) when is_binary(Bin) ->
+    Size = byte_size(Bin) div 2,
+    <<R:Size/binary, S:Size/binary>> = Bin,
+    R1 = add_zero_padding(R),
+    S1 = add_zero_padding(S),
+    DerBody = <<2, (byte_size(R1)):8, R1/binary, 2, (byte_size(S1)):8, S1/binary>>,
+    <<48, (byte_size(DerBody)):8, DerBody/binary>>.
+
+trim_zero_padding(B) ->
+    case byte_size(B) rem 2 of
+        0 -> B;
+        _ -> <<_, B1/binary>> = B, B1
+    end.
+
+add_zero_padding(B = <<1:1, _:7, _/binary>>) ->
+    <<0, B/binary>>;
+add_zero_padding(B) ->
+    B.
 
 algorithm_to_atom(<<"HS256">>) -> hs256;
 algorithm_to_atom(<<"RS256">>) -> rs256;
