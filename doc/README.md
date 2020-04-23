@@ -2,7 +2,7 @@
 
 # JWErl #
 
-Copyright (c) 2015, 2016, 2017, 2018, 2019 G-Corp
+Copyright (c) 2015, 2016, 2017, 2018, 2019 G-Corp - 2020 Gregoire Lejeune
 
 __Version:__ 1.1.0
 
