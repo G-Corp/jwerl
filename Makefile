@@ -7,7 +7,7 @@ include bu.mk
 release: dist lint tag
 	$(verbose) $(REBAR) hex publish
 
-doc::
+doc:: all-contributors
 	$(verbose) echo '## Contributors ##' >> README.md
 	$(verbose) echo >> README.md
 	$(verbose) echo 'Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):' >> README.md
@@ -18,3 +18,6 @@ doc::
 	$(verbose) echo >> README.md
 	$(verbose) echo 'This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!' >> README.md
 	$(verbose) all-contributors generate
+
+all-contributors:
+	$(verbose) npm install -g all-contributors-cli

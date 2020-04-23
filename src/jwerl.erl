@@ -64,6 +64,13 @@ verify(Data, Algorithm, KeyOrPem, Claims) ->
 %
 % This function support ext, nbt, iat, iss, sub, aud and jti.
 %
+% Options:
+%
+% <ul>
+% <li><tt>exp_leeway</tt> : <tt>integer()</tt></li>
+% <li><tt>iat_leeway</tt> : <tt>integer()</tt></li>
+% </ul>
+%
 % Example :
 %
 % <pre>
@@ -71,7 +78,7 @@ verify(Data, Algorithm, KeyOrPem, Claims) ->
 %                                                            aud =&gt; [&lt;&lt;"world"&gt;&gt;, &lt;&lt;"aliens"&gt;&gt;]}).
 % </pre>
 % @end
--spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false, Opts :: map()) ->
+-spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false, Opts :: map() | list()) ->
   {ok, map()} | {error, term()}.
 verify(Data, Algorithm, KeyOrPem, Claims, Opts) ->
   case decode(Data, KeyOrPem, Algorithm) of
@@ -99,16 +106,18 @@ verify(Data, Algorithm, KeyOrPem, Claims, Opts) ->
 header(Data) ->
   decode_header(Data).
 
-check_claims(TokenData, Claims, Opts) ->
+check_claims(TokenData, Claims, Opts) when is_map(Opts) ->
+  check_claims(TokenData, Claims, maps:to_list(Opts));
+check_claims(TokenData, Claims, Opts) when is_list(Opts) ->
   Now = os:system_time(seconds),
   claims_errors(
     [
      check_claim(TokenData, exp, false, fun(ExpireTime) ->
-                                            ExpLeeway = maps:get(exp_leeway, Opts, 0),
+                                            ExpLeeway = proplists:get_value(exp_leeway, Opts, 0),
                                             Now < ExpireTime + ExpLeeway
                                         end, exp),
      check_claim(TokenData, iat, false, fun(IssuedAt) ->
-                                            IatLeeway = maps:get(iat_leeway, Opts, 0),
+                                            IatLeeway = proplists:get_value(iat_leeway, Opts, 0),
                                             IssuedAt - IatLeeway =< Now
                                         end, iat),
      check_claim(TokenData, nbf, false, fun(NotBefore) ->
@@ -124,7 +133,9 @@ check_claims(TokenData, Claims, Opts) ->
           end, Claim)
         || {Claim, Expected} <- get_claims(Claims)
        ]
-    ], []).
+    ], []);
+check_claims(TokenData, Claims, _Opts) ->
+  check_claims(TokenData, Claims, []).
 
 claims_errors([], []) -> ok;
 claims_errors([], List) -> {error, List};

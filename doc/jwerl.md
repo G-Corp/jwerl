@@ -142,7 +142,7 @@ Equivalent to [`verify(Data, Algorithm, KeyOrPem, #{}, #{})`](#verify-5).
 ### verify/5 ###
 
 <pre><code>
-verify(Data::binary(), Algorithm::<a href="#type-algorithm">algorithm()</a>, KeyOrPem::binary(), CheckClaims::map() | list() | false, Opts::map()) -&gt; {ok, map()} | {error, term()}
+verify(Data::binary(), Algorithm::<a href="#type-algorithm">algorithm()</a>, KeyOrPem::binary(), CheckClaims::map() | list() | false, Opts::map() | list()) -&gt; {ok, map()} | {error, term()}
 </code></pre>
 <br />
 
@@ -150,6 +150,13 @@ Verify a JWToken according to the given `Algorithm`, `KeyOrPem` and `Claims`.
 This verifycation can ignore (`CheckClaims =:= false`) claims.
 
 This function support ext, nbt, iat, iss, sub, aud and jti.
+
+Options:
+
+* `exp_leeway` : `integer()`
+
+* `iat_leeway` : `integer()`
+
 
 Example :
 

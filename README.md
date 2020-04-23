@@ -8,7 +8,7 @@ __Version:__ 1.1.0
 
 __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.lejeune@gmail.com)).
 
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg)](#contributors)
 [![Hex.pm version](https://img.shields.io/hexpm/v/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![Hex.pm downloads](https://img.shields.io/hexpm/dt/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
 [![License](https://img.shields.io/hexpm/l/jwerl.svg?style=flat-square)](https://hex.pm/packages/jwerl)
@@ -125,9 +125,21 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 Thanks goes to these wonderful people ([emoji key](https://github.com/kentcdodds/all-contributors#emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore -->
-<table><tr><td align="center"><a href="http://spaceboyz.net/~astro/"><img src="https://avatars0.githubusercontent.com/u/12923?v=4" width="100px;" alt="Astro"/><br /><sub><b>Astro</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=astro" title="Code">💻</a> <a href="https://github.com/G-Corp/jwerl/commits?author=astro" title="Tests">⚠️</a></td><td align="center"><a href="http://lejeun.es"><img src="https://avatars1.githubusercontent.com/u/15168?v=4" width="100px;" alt="Gregoire Lejeune"/><br /><sub><b>Gregoire Lejeune</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=glejeune" title="Code">💻</a> <a href="#design-glejeune" title="Design">🎨</a> <a href="https://github.com/G-Corp/jwerl/commits?author=glejeune" title="Documentation">📖</a> <a href="https://github.com/G-Corp/jwerl/commits?author=glejeune" title="Tests">⚠️</a></td><td align="center"><a href="https://github.com/michalwski"><img src="https://avatars3.githubusercontent.com/u/705828?v=4" width="100px;" alt="Michał Piotrowski"/><br /><sub><b>Michał Piotrowski</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=michalwski" title="Code">💻</a></td><td align="center"><a href="https://hjianbo.me"><img src="https://avatars1.githubusercontent.com/u/13825269?v=4" width="100px;" alt="JianBo He"/><br /><sub><b>JianBo He</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=HJianBo" title="Code">💻</a> <a href="https://github.com/G-Corp/jwerl/commits?author=HJianBo" title="Documentation">📖</a> <a href="https://github.com/G-Corp/jwerl/commits?author=HJianBo" title="Tests">⚠️</a></td><td align="center"><a href="https://maqbool.net"><img src="https://avatars1.githubusercontent.com/u/7526000?v=4" width="100px;" alt="Mohammad Maqbool Alam"/><br /><sub><b>Mohammad Maqbool Alam</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=m13m" title="Documentation">📖</a></td><td align="center"><a href="https://github.com/ricardoccpaiva"><img src="https://avatars1.githubusercontent.com/u/2286067?v=4" width="100px;" alt="Ricardo Paiva"/><br /><sub><b>Ricardo Paiva</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=ricardoccpaiva" title="Code">💻</a> <a href="https://github.com/G-Corp/jwerl/commits?author=ricardoccpaiva" title="Tests">⚠️</a></td></tr></table>
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="http://spaceboyz.net/~astro/"><img src="https://avatars0.githubusercontent.com/u/12923?v=4" width="100px;" alt=""/><br /><sub><b>Astro</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=astro" title="Code">💻</a> <a href="https://github.com/G-Corp/jwerl/commits?author=astro" title="Tests">⚠️</a></td>
+    <td align="center"><a href="http://lejeun.es"><img src="https://avatars1.githubusercontent.com/u/15168?v=4" width="100px;" alt=""/><br /><sub><b>Gregoire Lejeune</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=glejeune" title="Code">💻</a> <a href="#design-glejeune" title="Design">🎨</a> <a href="https://github.com/G-Corp/jwerl/commits?author=glejeune" title="Documentation">📖</a> <a href="https://github.com/G-Corp/jwerl/commits?author=glejeune" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/michalwski"><img src="https://avatars3.githubusercontent.com/u/705828?v=4" width="100px;" alt=""/><br /><sub><b>Michał Piotrowski</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=michalwski" title="Code">💻</a></td>
+    <td align="center"><a href="https://hjianbo.me"><img src="https://avatars1.githubusercontent.com/u/13825269?v=4" width="100px;" alt=""/><br /><sub><b>JianBo He</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=HJianBo" title="Code">💻</a> <a href="https://github.com/G-Corp/jwerl/commits?author=HJianBo" title="Documentation">📖</a> <a href="https://github.com/G-Corp/jwerl/commits?author=HJianBo" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://maqbool.net"><img src="https://avatars1.githubusercontent.com/u/7526000?v=4" width="100px;" alt=""/><br /><sub><b>Mohammad Maqbool Alam</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=m13m" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/ricardoccpaiva"><img src="https://avatars1.githubusercontent.com/u/2286067?v=4" width="100px;" alt=""/><br /><sub><b>Ricardo Paiva</b></sub></a><br /><a href="https://github.com/G-Corp/jwerl/commits?author=ricardoccpaiva" title="Code">💻</a> <a href="https://github.com/G-Corp/jwerl/commits?author=ricardoccpaiva" title="Tests">⚠️</a></td>
+  </tr>
+</table>
 
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/kentcdodds/all-contributors) specification. Contributions of any kind welcome!
