@@ -26,7 +26,7 @@ sign(Data, Algorithm) ->
 
 -spec sign(Data :: map(), Algorithm :: algorithm(), KeyOrPem :: binary()) -> binary().
 sign(Data, Algorithm, KeyOrPem) ->
-    sign(Data, Algorithm, KeyOrPem, []).
+    sign(Data, Algorithm, KeyOrPem, #{}).
 
 % @doc
 % Sign <tt>Data</tt> with the given <tt>Algorithm</tt> and <tt>KeyOrPem</tt>.
@@ -47,8 +47,8 @@ sign(Data, Algorithm, KeyOrPem) ->
 % Token = jwerl:sign(#{key =&gt; &lt;&lt;"Hello World"&gt;&gt;}, hs256, &lt;&lt;"s3cr3t k3y"&gt;&gt;).
 % </pre>
 % @end
--spec sign(Data :: map() | list(), Algorithm :: algorithm(), KeyOrPem :: binary(), Opts :: list()) -> binary().
-sign(Data, Algorithm, KeyOrPem, Opts) when (is_map(Data) orelse is_list(Data)), is_atom(Algorithm), is_binary(KeyOrPem), is_list(Opts) ->
+-spec sign(Data :: map() | list(), Algorithm :: algorithm(), KeyOrPem :: binary(), Opts :: map()) -> binary().
+sign(Data, Algorithm, KeyOrPem, Opts) when (is_map(Data) orelse is_list(Data)), is_atom(Algorithm), is_binary(KeyOrPem), is_map(Opts) ->
     encode(jsx:encode(Data), config_headers(#{alg => algorithm_to_binary(Algorithm)}), KeyOrPem, Opts).
 
 % @equiv verify(Data, <<"">>, hs256, #{}, #{})
