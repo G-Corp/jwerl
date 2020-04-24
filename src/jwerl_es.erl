@@ -24,7 +24,24 @@ verify(ShaBits, Key, Data, Signature) ->
   EcpkParametersPem = {'EcpkParameters', Params, not_encrypted},
   ECParams = public_key:pem_entry_decode(EcpkParametersPem),
   ECPublicKey = {ECPoint, ECParams},
-  public_key:verify(Data, algo(ShaBits), Signature, ECPublicKey).
+  [FirstByte | _] = binary_to_list(Signature),
+
+  SignatureToVerify =
+    case FirstByte of
+      48 ->
+        %% DER Encoded Signature. When encoded in DER, raw signature from r & s format
+        %% becomes the following sequence of bytes:
+        %% 0x30 b1 0x02 b2 (vr) 0x02 b3 (vs)
+        Signature;
+      _ ->
+        SignatureLen = byte_size(Signature),
+        {RBin, SBin} = split_binary(Signature, (SignatureLen div 2)),
+        R = crypto:bytes_to_integer(RBin),
+        S = crypto:bytes_to_integer(SBin),
+        public_key:der_encode('ECDSA-Sig-Value', #'ECDSA-Sig-Value'{ r = R, s = S })
+    end,
+
+  public_key:verify(Data, algo(ShaBits), SignatureToVerify, ECPublicKey).
 
 algo(256) -> sha256;
 algo(384) -> sha384;
