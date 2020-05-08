@@ -115,7 +115,6 @@ t_jwerl_ecdsa() ->
                              jwerl:sign(Data, es512, ec_private_key()),
                              es512,
                              ec_public_key())),
-
   ?assertMatch({ok, Data}, jwerl:verify(
                              jwerl:sign(Data, es512, ec_private_key(), #{raw => true}),
                              es512,

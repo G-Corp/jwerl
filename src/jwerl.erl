@@ -15,18 +15,18 @@
                      es256 | es384 | es512 |
                      none.
 
-% @equiv sign(Data, hs256, <<"">>, #{})
+% @equiv sign(Data, hs256, <<"">>, [])
 -spec sign(Data :: map()) -> binary().
 sign(Data) ->
-    sign(Data, hs256, <<"">>, #{}).
-% @equiv sign(Data, Algorithm, <<"">>, #{})
+    sign(Data, hs256, <<"">>, []).
+% @equiv sign(Data, Algorithm, <<"">>, [])
 -spec sign(Data :: map(), Algorithm :: algorithm()) -> binary().
 sign(Data, Algorithm) ->
-    sign(Data, Algorithm, <<"">>, #{}).
-% @equiv sign(Data, Algorithm, KeyOrPem, #{})
+    sign(Data, Algorithm, <<"">>, []).
+% @equiv sign(Data, Algorithm, KeyOrPem, [])
 -spec sign(Data :: map(), Algorithm :: algorithm(), KeyOrPem :: binary()) -> binary().
 sign(Data, Algorithm, KeyOrPem) ->
-    sign(Data, Algorithm, KeyOrPem, #{}).
+    sign(Data, Algorithm, KeyOrPem, []).
 
 % @doc
 % Sign <tt>Data</tt> with the given <tt>Algorithm</tt> and <tt>KeyOrPem</tt>.
@@ -47,22 +47,24 @@ sign(Data, Algorithm, KeyOrPem) ->
 % Token = jwerl:sign(#{key =&gt; &lt;&lt;"Hello World"&gt;&gt;}, hs256, &lt;&lt;"s3cr3t k3y"&gt;&gt;).
 % </pre>
 % @end
--spec sign(Data :: map() | list(), Algorithm :: algorithm(), KeyOrPem :: binary(), Opts :: map()) -> binary().
-sign(Data, Algorithm, KeyOrPem, Opts) when (is_map(Data) orelse is_list(Data)), is_atom(Algorithm), is_binary(KeyOrPem), is_map(Opts) ->
+-spec sign(Data :: map() | list(), Algorithm :: algorithm(), KeyOrPem :: binary(), Opts :: map() | list()) -> binary().
+sign(Data, Algorithm, KeyOrPem, Opts) when is_map(Opts) ->
+    sign(Data, Algorithm, KeyOrPem, maps:to_list(Opts));
+sign(Data, Algorithm, KeyOrPem, Opts) when (is_map(Data) orelse is_list(Data)), is_atom(Algorithm), is_binary(KeyOrPem), is_list(Opts) ->
     encode(jsx:encode(Data), config_headers(#{alg => algorithm_to_binary(Algorithm)}), KeyOrPem, Opts).
 
-% @equiv verify(Data, <<"">>, hs256, #{}, #{})
+% @equiv verify(Data, <<"">>, hs256, #{}, [])
 verify(Data) ->
-    verify(Data, hs256, <<"">>, #{}, #{}).
-% @equiv verify(Data, Algorithm, <<"">>, #{}, #{})
+    verify(Data, hs256, <<"">>, #{}, []).
+% @equiv verify(Data, Algorithm, <<"">>, #{}, [])
 verify(Data, Algorithm) ->
-    verify(Data, Algorithm, <<"">>, #{}, #{}).
-% @equiv verify(Data, Algorithm, KeyOrPem, #{}, #{})
+    verify(Data, Algorithm, <<"">>, #{}, []).
+% @equiv verify(Data, Algorithm, KeyOrPem, #{}, [])
 verify(Data, Algorithm, KeyOrPem) ->
-  verify(Data, Algorithm, KeyOrPem, #{}, #{}).
-% @equiv verify(Data, Algorithm, KeyOrPem, Claims, #{})
+  verify(Data, Algorithm, KeyOrPem, #{}, []).
+% @equiv verify(Data, Algorithm, KeyOrPem, Claims, [])
 verify(Data, Algorithm, KeyOrPem, Claims) ->
-  verify(Data, Algorithm, KeyOrPem, Claims, #{}).
+  verify(Data, Algorithm, KeyOrPem, Claims, []).
 
 % @doc
 % Verify a JWToken according to the given <tt>Algorithm</tt>, <tt>KeyOrPem</tt> and <tt>Claims</tt>.
@@ -86,7 +88,10 @@ verify(Data, Algorithm, KeyOrPem, Claims) ->
 % @end
 -spec verify(Data :: binary(), Algorithm :: algorithm(), KeyOrPem :: binary(), CheckClaims :: map() | list() | false, Opts :: map() | list()) ->
   {ok, map()} | {error, term()}.
-verify(Data, Algorithm, KeyOrPem, Claims, Opts) ->
+
+verify(Data, Algorithm, KeyOrPem, Claims, Opts) when is_map(Opts) ->
+    verify(Data, Algorithm, KeyOrPem, Claims, maps:to_list(Opts));
+verify(Data, Algorithm, KeyOrPem, Claims, Opts) when is_list(Opts) ->
   case decode(Data, KeyOrPem, Algorithm, Opts) of
     {ok, TokenData} when is_map(Claims) orelse is_list(Claims) ->
       case check_claims(TokenData, Claims, Opts) of
@@ -112,8 +117,6 @@ verify(Data, Algorithm, KeyOrPem, Claims, Opts) ->
 header(Data) ->
   decode_header(Data).
 
-check_claims(TokenData, Claims, Opts) when is_map(Opts) ->
-  check_claims(TokenData, Claims, maps:to_list(Opts));
 check_claims(TokenData, Claims, Opts) when is_list(Opts) ->
   Now = os:system_time(seconds),
   claims_errors(
@@ -244,7 +247,7 @@ payload(Data, Algorithm, Key, Opts) ->
   [Header, Data1, Signature0] = binary:split(Data, <<".">>, [global]),
   {AlgMod, ShaBits} = algorithm_to_infos(Algorithm),
 
-  Signature = case maps:get(raw, Opts, false) of
+  Signature = case proplists:get_value(raw, Opts, false) of
                   true -> raw_to_der(base64_decode(Signature0));
                   _ -> base64_decode(Signature0)
               end,
@@ -264,7 +267,7 @@ encode_input(Data, Options) ->
 signature(Algorithm, Key, Data, Opts) ->
   {AlgMod, ShaBits} = algorithm_to_infos(Algorithm),
   Signature0 = erlang:apply(AlgMod, sign, [ShaBits, Key, Data]),
-  Signature = case maps:get(raw, Opts, false) of
+  Signature = case proplists:get_value(raw, Opts, false) of
                   true ->
                       der_to_raw(Signature0);
                   _ ->
