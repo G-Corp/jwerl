@@ -15,3 +15,5 @@ ebin
 .erlang.mk
 *.d
 test/eunit/
+rebar3.crashdump
+.rebar3/
