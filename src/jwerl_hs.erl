@@ -3,6 +3,7 @@
 
 -export([sign/3, verify/4]).
 
+%% @doc 签名
 sign(ShaBits, Key, Data) ->
   crypto:mac(hmac, algo(ShaBits), Key, Data).
 
