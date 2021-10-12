@@ -4,7 +4,7 @@
 -export([sign/3, verify/4]).
 
 sign(ShaBits, Key, Data) ->
-  crypto:hmac(algo(ShaBits), Key, Data).
+  crypto:mac(hmac, algo(ShaBits), Key, Data).
 
 verify(ShaBits, Key, Data, Signature) ->
   Signature == sign(ShaBits, Key, Data).
