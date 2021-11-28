@@ -11,7 +11,7 @@
 <br/>
 [![JWT](https://jwt.io/img/badge.svg)](https://jwt.io/)
 
-<b>Warning, versions prior to 1.0.0 are affected by <a href="https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/">this vulnerabilitie</a>. Get up to date!</b>
+<b>Warning, versions prior to 1.0.0 are affected by <a href="https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/">this vulnerability</a>. Get up to date!</b>
 
 <h2>Support</h2>
 
@@ -30,7 +30,7 @@
 Jwt = jwerl:sign([{name, &lt;&lt;"bob"&gt;&gt;}]).
 jwerl:verify(Jwt).
 
-% signed by specifing method
+% signed by specifying method
 Jwt = jwerl:sign([{name, &lt;&lt;"bob"&gt;&gt;}], hs512).
 jwerl:verify(Jwt, hs512).
 
@@ -62,7 +62,7 @@ jwerl:verify(Jwt, es256, PublcPem).
 jwt = Jwerl.sign([name: "bob"])
 Jwerl.verify(jwt)
 
-% signed by specifing method
+% signed by specifying method
 jwt = Jwerl.sign([name: "bob"], :hs512)
 Jwerl.verify(jwt, :hs512)
 

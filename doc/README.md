@@ -15,7 +15,7 @@ __Authors:__ Gregoire Lejeune ([`gregoire.lejeune@gmail.com`](mailto:gregoire.le
 <br />
 [![JWT](https://jwt.io/img/badge.svg)](https://jwt.io/)
 
-__Warning, versions prior to 1.0.0 are affected by [this vulnerabilitie](https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/). Get up to date!__
+__Warning, versions prior to 1.0.0 are affected by [this vulnerability](https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/). Get up to date!__
 
 
 ## Support ##
@@ -36,7 +36,7 @@ __Warning, versions prior to 1.0.0 are affected by [this vulnerabilitie](https:/
 Jwt = jwerl:sign([{name, <<"bob">>}]).
 jwerl:verify(Jwt).
 
-% signed by specifing method
+% signed by specifying method
 Jwt = jwerl:sign([{name, <<"bob">>}], hs512).
 jwerl:verify(Jwt, hs512).
 
@@ -71,7 +71,7 @@ jwerl:verify(Jwt, es256, PublcPem).
 jwt = Jwerl.sign([name: "bob"])
 Jwerl.verify(jwt)
 
-% signed by specifing method
+% signed by specifying method
 jwt = Jwerl.sign([name: "bob"], :hs512)
 Jwerl.verify(jwt, :hs512)
 
