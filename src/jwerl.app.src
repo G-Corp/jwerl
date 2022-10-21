@@ -1,6 +1,6 @@
 {application, jwerl, [
   {description, "JWT Library for Erlang and Elixir"}
-  , {vsn, "1.1.0"}
+  , {vsn, "1.2.0"}
   , {registered, []}
   , {modules, []}
   , {applications, [kernel, stdlib, jsx]}
