@@ -1,7 +1,7 @@
 before_script:
   - curl -sL https://deb.nodesource.com/setup_10.x | bash -
   - apt-get -qq update
-  - apt-get install --yes nodejs
+  - apt-get install --yes nodejs npm
   - npm i all-contributors-cli -g
 
 build:1.14.0:
