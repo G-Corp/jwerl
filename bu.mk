@@ -210,7 +210,7 @@ else
 	$(verbose) erl -pa $(CURDIR)/_build/$(REBAR_ENV)/lib/*/ebin $(CURDIR)/_build/$(REBAR_ENV)/lib/*/include -name ${NODE_NAME}@${NODE_HOST} -setcookie ${current_dir}
 endif
 
-dist-erl: clean compile-erl tests $(LINT) $(XREF) doc
+dist-erl: clean compile-erl tests $(XREF) doc
 
 clean-erl:
 	$(verbose) $(RM_RF) _build test/eunit
