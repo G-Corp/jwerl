@@ -70,6 +70,16 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "vkatsuba",
+      "name": "Viacheslav Katsuba",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16745411?v=4",
+      "profile": "https://www.linkedin.com/in/vkatsuba",
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
     }
   ],
   "commitConvention": "none"
