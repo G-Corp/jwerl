@@ -218,7 +218,7 @@ clean-erl:
 distclean-erl: clean-erl
 	$(verbose) $(RM_F) rebar.lock
 
-info: ## Display application informations
+info: ## Display application information
 	$(verbose) echo "App source file: $(APP_SRC)"
 	$(verbose) echo "App name:        $(APP_NAME)"
 	$(verbose) echo "App version:     $(APP_VERSION)"
