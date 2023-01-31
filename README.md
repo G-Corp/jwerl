@@ -59,7 +59,6 @@ jwerl:verify(Jwt, rs512, PublcPem).
 {ok, PublcPem} = file:read_file("path/to/es_public.pem"),
 Jwt = jwerl:sign([{name, <<"bob">>}], es256, PrivtPem).
 jwerl:verify(Jwt, es256, PublcPem).
-
 ```
 
 
@@ -94,7 +93,6 @@ Jwerl.verify(jwt, :rs512, public_pem)
 {ok, public_pem} = File.read("path/to/es_public.pem")
 jwt = Jwerl.sign([name: "bob"], :es256, private_pem)
 Jwerl.verify(jwt, :es256, public_pem)
-
 ```
 
 
